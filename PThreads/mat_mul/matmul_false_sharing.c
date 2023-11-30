@@ -21,7 +21,6 @@ double* A;
 double* B;
 double* C;
 
-
 void rand_matrix(double* mat, const size_t m) {
     unsigned int seed = time(NULL);
     for (size_t i = 0; i < m; i++) 
@@ -62,18 +61,23 @@ void* worker(void* args_) {
     const size_t m   = args->m;
     const size_t n   = args->n;
     const size_t p   = args->p;
-    printf("\t\t\t%4ld %4ld %4ld %4ld %4ld\n", m, n, p, args->start, args->end);
 
-    register size_t C_sub = args->start, A_sub = args->start * n;
+    register size_t C_sub = args->start * p, A_sub = args->start * n;
+    int count = 0;
 
-    for (size_t j = 0; j < p; j++, C_sub++) {
-        // printf("Accessing: %4ld, %ld, %ld, %ld\n", i * m + j, i, m, j);
-        C[C_sub] = 0;
-        for (size_t k = 0; k < n; k++) 
-            C[C_sub] += A[A_sub++] * B[k * p + j];
+    for (size_t i = args->start; i < end; i++, A_sub += n) { 
+
+        for (size_t j = 0; j < p; j++, C_sub++) {
+
+            C[C_sub] = 0;
+            for (size_t k = 0; k < n; k++) {
+                count++;
+                C[C_sub] += A[A_sub + k] * B[k * p + j];
+            }
+        }
     }
     
-
+    printf("%d\n", count);
     return NULL;
 }
 
@@ -84,15 +88,15 @@ void compute(const size_t m, const size_t n, const size_t p, const size_t thread
     Args* args = malloc(sizeof(*args) * threads);
 
     const size_t thread_rows = m / threads;
+
     for (size_t i = 0; i < threads; i++) {
+        
         args[i].start = i * thread_rows;
-        args[i].end   = (i + 1) * thread_rows;
-        // args[i].start = i;
-        // args[i].end   = (i + 1);
-        printf("%4ld %4ld\n", args[i].start, args[i].end);
-        args[i].m     = m;
-        args[i].n     = n;
-        args[i].p     = p;
+        args[i].end = (i + 1) * thread_rows;
+        args[i].m = m;
+        args[i].n = n;
+        args[i].p = p;
+
         pthread_create(&tids[i], NULL, worker, &args[i]);
     }
 
@@ -108,9 +112,9 @@ int main(const int argc, const char* argv[]) {
     if (argc != 5)
         USAGE()
     
-    const size_t m       = atol(argv[1]);
-    const size_t n       = atol(argv[2]);
-    const size_t p       = atol(argv[3]);
+    const size_t m = atol(argv[1]);
+    const size_t n = atol(argv[2]);
+    const size_t p = atol(argv[3]);
     const size_t threads = atol(argv[4]);
 
     
@@ -127,11 +131,7 @@ int main(const int argc, const char* argv[]) {
     GET_TIME(finish);
     
     printf("Matrix Multiplication took %8.6f seconds\n", finish - start);
-    
-
 
     return 0;
 }
-
-
 

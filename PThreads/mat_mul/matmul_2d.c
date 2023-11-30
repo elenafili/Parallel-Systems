@@ -40,8 +40,8 @@ void print_matrix(double** mat, const size_t m, const size_t n) {
 
 void matrices_init(const size_t m, const size_t n, const size_t p) {
     A = malloc(sizeof(*A) * m);
-    C = malloc(sizeof(*A) * m);
-    B = malloc(sizeof(*A) * n);
+    C = malloc(sizeof(*C) * m);
+    B = malloc(sizeof(*B) * n);
 
     for (size_t i = 0; i < m; i++) {
         A[i] = malloc(sizeof(**A) * n);
@@ -114,7 +114,6 @@ int main(const int argc, const char* argv[]) {
     const size_t p       = atol(argv[3]);
     const size_t threads = atol(argv[4]);
 
-    
     double start, finish;
 
     GET_TIME(start);
@@ -129,8 +128,6 @@ int main(const int argc, const char* argv[]) {
     
     printf("Matrix Multiplication took %8.6f seconds\n", finish - start);
     
-
-
     return 0;
 }
 
