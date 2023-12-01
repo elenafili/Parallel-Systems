@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/stat.h>
+
 #include "timer.h"
 #include "my_rand.h"
 
@@ -17,9 +21,24 @@
         exit(EXIT_FAILURE);      \
     }                            \
 
+size_t m, n, p, threads;
 double* A;
 double* B;
 double* C;
+
+void write_matrix(double* mat, const size_t size, const char* path) {
+
+    int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+
+    if (fd == -1) {
+        perror("Error opening file");
+        exit(EXIT_FAILURE);
+    }
+    
+    write(fd, mat, size * sizeof(double));
+
+    close(fd);
+}
 
 void rand_matrix(double* mat, const size_t m) {
     unsigned int seed = time(NULL);
@@ -27,15 +46,7 @@ void rand_matrix(double* mat, const size_t m) {
         mat[i] = my_drand(&seed);
 } 
 
-void print_matrix(double* mat, const size_t m, const size_t n) {
-    for (size_t i = 0; i < m; i++) {
-        for (size_t j = 0; j < n; j++)
-            printf("%6.4f ", mat[i * m + j]);
-        printf("\n");
-    }
-} 
-
-void matrices_init(const size_t m, const size_t n, const size_t p) {
+void matrices_init() {
     A = malloc(sizeof(*A) * m * n);
     C = malloc(sizeof(*C) * m * p);
     B = malloc(sizeof(*B) * n * p);
@@ -44,47 +55,32 @@ void matrices_init(const size_t m, const size_t n, const size_t p) {
     rand_matrix(B, n * p);
 }
 
-// Structure for passing data to threads
 typedef struct {
     size_t start;
     size_t end;
-    size_t m;
-    size_t n;
-    size_t p;
 } Args;
 
-// Function to perform matrix multiplication for a given range of rows
 void* worker(void* args_) {
-    Args* args = args_;
-
-    const size_t end = args->end;
-    const size_t m   = args->m;
-    const size_t n   = args->n;
-    const size_t p   = args->p;
+    const Args* args = args_;
 
     register size_t C_sub = args->start * p, A_sub = args->start * n;
-    int count = 0;
 
-    for (size_t i = args->start; i < end; i++, A_sub += n) { 
+    for (size_t i = args->start; i < args->end; i++, A_sub += n) { 
 
         for (size_t j = 0; j < p; j++, C_sub++) {
-
+            
             C[C_sub] = 0;
-            for (size_t k = 0; k < n; k++) {
-                count++;
+            for (size_t k = 0; k < n; k++)
                 C[C_sub] += A[A_sub + k] * B[k * p + j];
-            }
         }
     }
     
-    printf("%d\n", count);
     return NULL;
 }
 
-void compute(const size_t m, const size_t n, const size_t p, const size_t threads) {
+void compute() {
     pthread_t* tids = malloc(sizeof(*tids) * threads); 
 
-    // Create and join threads for matrix multiplication
     Args* args = malloc(sizeof(*args) * threads);
 
     const size_t thread_rows = m / threads;
@@ -93,11 +89,8 @@ void compute(const size_t m, const size_t n, const size_t p, const size_t thread
         
         args[i].start = i * thread_rows;
         args[i].end = (i + 1) * thread_rows;
-        args[i].m = m;
-        args[i].n = n;
-        args[i].p = p;
 
-        pthread_create(&tids[i], NULL, worker, &args[i]);
+        ASSERT(pthread_create(&tids[i], NULL, worker, &args[i]));
     }
 
     for (size_t i = 0; i < threads; i++)
@@ -112,25 +105,29 @@ int main(const int argc, const char* argv[]) {
     if (argc != 5)
         USAGE()
     
-    const size_t m = atol(argv[1]);
-    const size_t n = atol(argv[2]);
-    const size_t p = atol(argv[3]);
-    const size_t threads = atol(argv[4]);
+    m = atol(argv[1]);
+    n = atol(argv[2]);
+    p = atol(argv[3]);
+    threads = atol(argv[4]);
 
     
     double start, finish;
 
     GET_TIME(start);
-    matrices_init(m, n, p);
+    matrices_init();
     GET_TIME(finish);
 
     printf("Initialaziation took %8.6f seconds\n", finish - start);
     
     GET_TIME(start);
-    compute(m, n, p, threads);
+    compute();
     GET_TIME(finish);
     
     printf("Matrix Multiplication took %8.6f seconds\n", finish - start);
+
+    write_matrix(A, m * n, "./files/A.bin");
+    write_matrix(B, n * p, "./files/B.bin");
+    write_matrix(C, m * p, "./files/C.bin");
 
     return 0;
 }
