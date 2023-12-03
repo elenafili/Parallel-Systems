@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
         USAGE()
     
     size_t threads = atol(argv[1]);
-    LONG n         = atoll(argv[2]);
+    LONG n = atoll(argv[2]);
 
     if (threads > MAX_THREADS || n == 0)
         USAGE()
