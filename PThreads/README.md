@@ -23,4 +23,14 @@ The parallel version of the algorithm is executed when the command line argument
 
 `threaded_pi(size_t threads, LONG n)`: This functions is responsible for dividing the total number of arrows among the threads, creating and joining the threads, initializing and destroying the mutex used for sychronization and returning the approximation of `pi`. 
 
-**Important**:
+**Implmentation Details**: type `long long` is macro-defined as `LONG`.
+
+**Important**: The number of sampling points `<n>`, given from command line, must be divisible by the number of `<threads>`.
+
+### Presentation of experiments and analysis
+
+
+## Exercise 1.2
+
+### Description of the problem
+The goal of this exercise is to implement a parallel **matrix multiplication** program using `PThreads`. An observation made after implementing the initial version of the exercise (`matmul_false_sharing.c`) was the presence of *false sharing*. **False sharing** occurs when multiple threads, running on separate cores, access different variables that happen to reside on the same cache line. To address that issue, we implemented three alternative programs (`matmul_2d.c`, `matmul_pad_var.c`, `matmul_private_var.c`).

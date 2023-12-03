@@ -72,7 +72,6 @@ double threaded_pi(size_t threads, LONG n) {
     return 4 * arrows / (double) n;
 }
 
-
 int main(int argc, char* argv[]) {
 
     if (argc < 3)
