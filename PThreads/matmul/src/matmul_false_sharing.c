@@ -125,10 +125,12 @@ int main(const int argc, const char* argv[]) {
     
     printf("Matrix Multiplication took %8.6f seconds\n", finish - start);
 
-    write_matrix(A, m * n, "./files/A.bin");
-    write_matrix(B, n * p, "./files/B.bin");
-    write_matrix(C, m * p, "./files/C.bin");
-
+    #ifdef VERIFY
+        write_matrix(A, m * n, "./files/A.bin");
+        write_matrix(B, n * p, "./files/B.bin");
+        write_matrix(C, m * p, "./files/C.bin");
+    #endif
+    
     return 0;
 }
 

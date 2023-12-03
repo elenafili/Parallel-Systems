@@ -18,7 +18,8 @@ PAD_VAR_SRCS  := $(subst .c,.o,$(PAD_VAR_SRCS))
 PRIV_VAR_SRCS  :=  ./src/matmul_private_var.c $(COMMON_SRCS)
 PRIV_VAR_OBJS  := $(subst .c,.o,$(PRIV_VAR_SRCS))
 
-CFLAGS := -std=c11 -Wall -Wextra -I$(COMMON_INCS)
+DEFINES = 
+CFLAGS := -std=c11 -Wall -Wextra -I$(COMMON_INCS) -D$(DEFINES)
 
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c $^ -o $@
