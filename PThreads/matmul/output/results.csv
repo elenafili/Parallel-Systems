@@ -1,0 +1,190 @@
+n,threads,time
+false sharing,2,18.335282
+false sharing,4,11.683441
+false sharing,8,8.848288
+false sharing,2,0.148920
+false sharing,4,0.091980
+false sharing,8,0.057942
+false sharing,2,0.317197
+false sharing,4,0.164849
+false sharing,8,0.112134
+false sharing,2,0.607785
+false sharing,4,0.342985
+false sharing,8,0.261943
+false sharing,2,1.264403
+false sharing,4,0.706484
+false sharing,8,0.587608
+false sharing,2,0.159093
+false sharing,4,0.197905
+false sharing,8,0.212156
+false sharing,2,0.288669
+false sharing,4,0.337040
+false sharing,8,0.403504
+false sharing,2,0.761709
+false sharing,4,0.562405
+false sharing,8,0.489218
+false sharing,2,2.494329
+false sharing,4,1.433055
+false sharing,8,1.052058
+2d,2,28.604735
+2d,4,19.036756
+2d,8,12.994457
+2d,2,0.204452
+2d,4,0.119196
+2d,8,0.084101
+2d,2,0.345873
+2d,4,0.234978
+2d,8,0.212289
+2d,2,0.789433
+2d,4,0.466320
+2d,8,0.371478
+2d,2,1.611362
+2d,4,1.319849
+2d,8,0.794546
+2d,2,0.258192
+2d,4,0.143320
+2d,8,0.171073
+2d,2,0.522755
+2d,4,0.345122
+2d,8,0.339365
+2d,2,1.081821
+2d,4,0.785941
+2d,8,0.695691
+2d,2,3.217751
+2d,4,1.588199
+2d,8,1.825741
+private variable,2,20.376451
+private variable,4,12.614503
+private variable,8,8.895765
+private variable,2,0.191913
+private variable,4,0.113330
+private variable,8,0.058341
+private variable,2,0.404475
+private variable,4,0.209218
+private variable,8,0.122168
+private variable,2,0.789146
+private variable,4,0.457494
+private variable,8,0.242497
+private variable,2,1.596989
+private variable,4,0.881500
+private variable,8,0.523674
+private variable,2,0.194413
+private variable,4,0.114399
+private variable,8,0.058359
+private variable,2,0.431151
+private variable,4,0.221581
+private variable,8,0.143215
+private variable,2,1.035817
+private variable,4,0.491430
+private variable,8,0.361931
+private variable,2,2.340612
+private variable,4,1.320968
+private variable,8,1.489984
+padding,2,18.003857
+padding,4,11.286699
+padding,8,8.289861
+padding,2,19.248347
+padding,4,11.665575
+padding,8,8.489602
+padding,2,18.073352
+padding,4,11.537529
+padding,8,8.600446
+padding,2,17.711796
+padding,4,11.591094
+padding,8,8.716269
+padding,2,0.134344
+padding,4,0.092360
+padding,8,0.062747
+padding,2,0.135249
+padding,4,0.083863
+padding,8,0.062640
+padding,2,0.128138
+padding,4,0.087296
+padding,8,0.090847
+padding,2,0.155680
+padding,4,0.080756
+padding,8,0.057376
+padding,2,0.317503
+padding,4,0.185262
+padding,8,0.123742
+padding,2,0.275541
+padding,4,0.164054
+padding,8,0.114266
+padding,2,0.310220
+padding,4,0.153588
+padding,8,0.147683
+padding,2,0.405771
+padding,4,0.264531
+padding,8,0.187801
+padding,2,0.961884
+padding,4,0.490815
+padding,8,0.366674
+padding,2,0.979425
+padding,4,0.570379
+padding,8,0.294664
+padding,2,0.828544
+padding,4,0.537346
+padding,8,0.306870
+padding,2,0.862788
+padding,4,0.587799
+padding,8,0.337573
+padding,2,2.152627
+padding,4,1.126004
+padding,8,0.699327
+padding,2,2.229398
+padding,4,0.796486
+padding,8,0.542970
+padding,2,1.362888
+padding,4,1.023874
+padding,8,0.655220
+padding,2,1.547796
+padding,4,0.865011
+padding,8,0.590822
+padding,2,0.177283
+padding,4,0.161281
+padding,8,0.151101
+padding,2,0.143907
+padding,4,0.092969
+padding,8,0.110404
+padding,2,0.421567
+padding,4,0.095804
+padding,8,0.057182
+padding,2,0.164534
+padding,4,0.122004
+padding,8,0.058828
+padding,2,0.404162
+padding,4,0.232095
+padding,8,0.243778
+padding,2,0.356121
+padding,4,0.228661
+padding,8,0.145381
+padding,2,0.391607
+padding,4,0.201719
+padding,8,0.197079
+padding,2,0.338931
+padding,4,0.207291
+padding,8,0.191336
+padding,2,0.820932
+padding,4,0.543656
+padding,8,0.457417
+padding,2,0.905957
+padding,4,0.515980
+padding,8,0.519505
+padding,2,0.848422
+padding,4,0.570013
+padding,8,0.434005
+padding,2,0.833051
+padding,4,0.527517
+padding,8,0.486521
+padding,2,2.498696
+padding,4,1.894562
+padding,8,1.606445
+padding,2,2.499101
+padding,4,1.775569
+padding,8,1.673018
+padding,2,2.917819
+padding,4,2.323962
+padding,8,1.835443
+padding,2,2.772939
+padding,4,2.024532
+padding,8,1.697231

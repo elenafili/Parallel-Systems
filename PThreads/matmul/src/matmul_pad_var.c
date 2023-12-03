@@ -8,11 +8,11 @@
 #include "timer.h"
 #include "my_rand.h"
 
-#define USAGE() {                                                           \
-    fprintf(stderr, "Usage: %s <m> <n> <p> <pad> <threads>\n", argv[0]);    \
-    fprintf(stderr, "       m, n, p pad, threads > 0\n");                   \
-    fprintf(stderr, "       m should be divisible by threads >= 1\n");      \
-    exit(EXIT_FAILURE);                                                     \
+#define USAGE() {                                                                               \
+    fprintf(stderr, "Usage: %s <m> <n> <p> <pad> <threads> <log file, optional>\n", argv[0]);   \
+    fprintf(stderr, "       m, n, p pad, threads > 0\n");                                       \
+    fprintf(stderr, "       m should be divisible by threads >= 1\n");                          \
+    exit(EXIT_FAILURE);                                                                         \
 }
 
 #define ASSERT(call)             \
@@ -117,7 +117,7 @@ void compute() {
 
 int main(const int argc, const char* argv[]) {
 
-    if (argc != 6)
+    if (argc < 6)
         USAGE()
     
     m = atol(argv[1]);
@@ -146,6 +146,14 @@ int main(const int argc, const char* argv[]) {
         write_matrix(B, n * p, "./files/B.bin");
         write_matrix(C, m * p * pad, "./files/C.bin");
     #endif
+
+    if (argc == 7) {
+        FILE* file = fopen(argv[6], "a");
+
+        fprintf(file, "padding,%ld,%f\n", threads, finish - start);
+
+        fclose(file);
+    }
 
     return 0;
 }
