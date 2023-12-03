@@ -7,11 +7,11 @@
 
 #define LONG long long
 #define MAX_THREADS 1024
-#define USAGE() {                                                       \
-    fprintf(stderr, "Usage: %s <threads> <n>\n", argv[0]);              \
-    fprintf(stderr, "       1 <= `threads` <= %d\n", MAX_THREADS);      \
-    fprintf(stderr, "       `n` >= 1 and divisible by `threads`\n");    \
-    exit(EXIT_FAILURE);                                                 \
+#define USAGE() {                                                               \
+    fprintf(stderr, "Usage: %s <threads> <n> <log file, optional> \n", argv[0]);\
+    fprintf(stderr, "       1 <= `threads` <= %d\n", MAX_THREADS);              \
+    fprintf(stderr, "       `n` >= 1 and divisible by `threads`\n");            \
+    exit(EXIT_FAILURE);                                                         \
 }
 
 #define ASSERT(call)             \
@@ -81,7 +81,7 @@ double threaded_pi(size_t threads, LONG n) {
 
 int main(int argc, char* argv[]) {
 
-    if (argc != 3)
+    if (argc < 3)
         USAGE()
     
     size_t threads = atol(argv[1]);
@@ -90,25 +90,28 @@ int main(int argc, char* argv[]) {
     if (threads > MAX_THREADS || n == 0)
         USAGE()
 
-    fprintf(stdout, "+----------+------------+---------------+\n");
-    fprintf(stdout, "|          |     pi     | elapsed (sec) |\n");
-    fprintf(stdout, "|----------+------------+---------------|\n");
+    fprintf(stdout, "+-----------+------------+---------------+\n");
+    fprintf(stdout, "|  Threads  |     pi     | elapsed (sec) |\n");
+    fprintf(stdout, "|-----------+------------+---------------|\n");
 
     double start, finish, pi;
-
-    GET_TIME(start);
-    pi = serial_pi(n);
-    GET_TIME(finish);
-
-    fprintf(stdout, "|  Serial  | %.8f | %13.8f |\n", pi, finish - start);
 
     GET_TIME(start);
     pi = threaded_pi(threads, n);
     GET_TIME(finish);
 
-    fprintf(stdout, "| Threaded | %.8f | %13.8f |\n", pi, finish - start);
+    double threaded_time = finish - start;
+    fprintf(stdout, "|     %2ld    | %.8f | %13.8f |\n", threads, pi, threaded_time);
 
-    fprintf(stdout, "+----------+------------+---------------+\n");
+    fprintf(stdout, "+-----------+------------+---------------+\n");
+
+    if (argc == 4) {
+        FILE* file = fopen(argv[3], "a");
+
+        fprintf(file, "%f", threaded_time);
+
+        fclose(file);
+    }
 
     return 0;
 }
