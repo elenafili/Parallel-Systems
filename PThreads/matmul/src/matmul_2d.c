@@ -34,8 +34,8 @@ void write_matrix(double** mat, const size_t m, const size_t n, const char* path
         perror("Error opening file");
         exit(EXIT_FAILURE);
     }
-    
-    for (size_t i = 0; i < m; i++)
+
+    for (size_t i = 0; i < m; i++) 
         write(fd, mat[i], n * sizeof(double));
 
     close(fd);

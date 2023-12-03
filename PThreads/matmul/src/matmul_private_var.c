@@ -8,11 +8,11 @@
 #include "timer.h"
 #include "my_rand.h"
 
-#define USAGE() {                                                           \
-    fprintf(stderr, "Usage: %s <m> <n> <p> <pad> <threads>\n", argv[0]);    \
-    fprintf(stderr, "       m, n, p pad, threads > 0\n");                   \
-    fprintf(stderr, "       m should be divisible by threads >= 1\n");      \
-    exit(EXIT_FAILURE);                                                     \
+#define USAGE() {                                                       \
+    fprintf(stderr, "Usage: %s <m> <n> <p> <threads>\n", argv[0]);      \
+    fprintf(stderr, "       m, n, p > 0 and threads >= 1\n");           \
+    fprintf(stderr, "       m should be divisible by threads >= 1\n");  \
+    exit(EXIT_FAILURE);                                                 \
 }
 
 #define ASSERT(call)             \
@@ -21,7 +21,7 @@
         exit(EXIT_FAILURE);      \
     }                            \
 
-size_t m, n, p, pad, threads;
+size_t m, n, p, threads;
 double* A;
 double* B;
 double* C;
@@ -34,23 +34,8 @@ void write_matrix(double* mat, const size_t size, const char* path) {
         perror("Error opening file");
         exit(EXIT_FAILURE);
     }
-
-    if (mat != C)
-        write(fd, mat, size * sizeof(double));
-    else {
-        double* line = malloc(p * sizeof(double));
-        
-        for (size_t i = 0; i < m * pad; i += pad) {
-
-            for (size_t j = 0; j < p; j++) 
-                line[j] = mat[i * p + j];
-
-            write(fd, line, p * sizeof(double));
-        }
-
-
-        free(line);
-    }
+    
+    write(fd, mat, size * sizeof(double));
 
     close(fd);
 }
@@ -63,7 +48,7 @@ void rand_matrix(double* mat, const size_t m) {
 
 void matrices_init() {
     A = malloc(sizeof(*A) * m * n);
-    C = malloc(sizeof(*C) * m * p * pad);
+    C = malloc(sizeof(*C) * m * p);
     B = malloc(sizeof(*B) * n * p);
 
     rand_matrix(A, m * n);
@@ -78,15 +63,17 @@ typedef struct {
 void* worker(void* args_) {
     const Args* args = args_;
 
-    register size_t C_sub = args->start * p * pad, A_sub = args->start * n;
+    register size_t C_sub = args->start * p, A_sub = args->start * n;
 
-    for (size_t i = args->start; i < args->end; i++, A_sub += n, C_sub += p * (pad - 1)) { 
+    for (size_t i = args->start; i < args->end; i++, A_sub += n) { 
 
         for (size_t j = 0; j < p; j++, C_sub++) {
-            C[C_sub] = 0;
-
-            for (size_t k = 0; k < n; k++) 
-                C[C_sub] += A[A_sub + k] * B[k * p + j];
+            
+            register size_t temp = 0;
+            for (size_t k = 0; k < n; k++)
+                temp += A[A_sub + k] * B[k * p + j];
+            
+            C[C_sub] = temp;
         }
     }
     
@@ -117,14 +104,13 @@ void compute() {
 
 int main(const int argc, const char* argv[]) {
 
-    if (argc != 6)
+    if (argc != 5)
         USAGE()
     
     m = atol(argv[1]);
     n = atol(argv[2]);
     p = atol(argv[3]);
-    pad = atol(argv[4]);
-    threads = atol(argv[5]);
+    threads = atol(argv[4]);
 
     
     double start, finish;
@@ -143,7 +129,7 @@ int main(const int argc, const char* argv[]) {
 
     write_matrix(A, m * n, "./files/A.bin");
     write_matrix(B, n * p, "./files/B.bin");
-    write_matrix(C, m * p * pad, "./files/C.bin");
+    write_matrix(C, m * p, "./files/C.bin");
 
     return 0;
 }
