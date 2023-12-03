@@ -34,3 +34,16 @@ The parallel version of the algorithm is executed when the command line argument
 
 ### Description of the problem
 The goal of this exercise is to implement a parallel **matrix multiplication** program using `PThreads`. An observation made after implementing the initial version of the exercise (`matmul_false_sharing.c`) was the presence of *false sharing*. **False sharing** occurs when multiple threads, running on separate cores, access different variables that happen to reside on the same cache line. To address that issue, we implemented three alternative programs (`matmul_2d.c`, `matmul_pad_var.c`, `matmul_private_var.c`).
+
+### Brief description of the solution
+
+#### matmul_false_sharing.c
+In this implementation, we **flatten** the `2D` matrices into `1D` vectors and perform the multiplication accordingly. The total computations are divided among the threads, with each one handling the computations for a specific number of consecutive rows.
+
+#### matmul_2d.c
+Here we handle the matrices as `2D` arrays
+
+#### matmul_pad_var.c
+
+#### matmul_private_var.c2D
+Matrices are stored in memory and handled as in `matmul_false_sharing.c`. This method differs from the previously mentioned, as it uses one local variable in the stack to calculate the sum for a specific row and column. After the sum is computed, the value is assigned to the corresponding position in the array.
