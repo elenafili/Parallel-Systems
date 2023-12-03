@@ -108,7 +108,8 @@ int main(int argc, char* argv[]) {
     if (argc == 4) {
         FILE* file = fopen(argv[3], "a");
 
-        fprintf(file, "%f", threaded_time);
+        fprintf(file, "%lld,%ld,%f\n", n, threads, threaded_time);
+        // printf("%ld,%ld,%f\n", n, threads, threaded_time);
 
         fclose(file);
     }
