@@ -39,12 +39,6 @@ double approx_percentage(LONG n) {
     return arrows_hit;
 }
 
-
-double serial_pi(LONG n) {
-    return 4 * approx_percentage(n) / (double) n;
-}
-
-
 // Shared Variables between threads
 LONG arrows = 0;
 pthread_mutex_t mutex;
@@ -101,7 +95,7 @@ int main(int argc, char* argv[]) {
     GET_TIME(finish);
 
     double threaded_time = finish - start;
-    fprintf(stdout, "|     %2ld    | %.8f | %13.8f |\n", threads, pi, threaded_time);
+    fprintf(stdout, "|     %ld     | %.8f | %13.8f |\n", threads, pi, threaded_time);
 
     fprintf(stdout, "+-----------+------------+---------------+\n");
 
@@ -109,7 +103,6 @@ int main(int argc, char* argv[]) {
         FILE* file = fopen(argv[3], "a");
 
         fprintf(file, "%lld,%ld,%f\n", n, threads, threaded_time);
-        // printf("%ld,%ld,%f\n", n, threads, threaded_time);
 
         fclose(file);
     }
