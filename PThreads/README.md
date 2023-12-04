@@ -12,7 +12,7 @@
 In this problem, the task is to use the **Monte Carlo** method to approximate `pi` by sampling random points in a `2x2` square (centered at `(0, 0)`) and observing how many of them fall within the unit circle. We approach the problem with both serial and parallel implementations (using `PThreads`). As expected, the method produces better approximations as we increase the number of iterations, but that is not efficient when using the serial algorithm. To accelerate the computation, we utilize PThreads to parallelize the random sampling among them.
 
 ### Brief description of the solution
-- **Serial**: 
+- **Serial**:
 The serial version of the algorithm is executed when the command line argument `<threads>` is set to `1`.
 - **Parallel**:
 The parallel version of the algorithm is executed when the command line argument `<threads>` is greater than `1`. In this version, the samples of random points from arrow throwing are divided equally among the threads.
@@ -21,21 +21,20 @@ The parallel version of the algorithm is executed when the command line argument
 
 `worker(void* args)`: This function utilizes `approx_percentage()` to compute the number of arrows -that landed in the critical area- for the corresponding thread and then adds the result in the global variable `arrows`, which is guarded by a mutex.
 
-`threaded_pi(size_t threads, LONG n)`: This functions is responsible for dividing the total number of arrows among the threads, creating and joining the threads, initializing and destroying the mutex used for sychronization and returning the approximation of `pi`. 
+`threaded_pi(size_t threads, LONG n)`: This functions is responsible for dividing the total number of arrows among the threads, creating and joining the threads, initializing and destroying the mutex used for sychronization and returning the approximation of `pi`.
 
 **Implmentation Details**: type `long long` is macro-defined as `LONG`.
 
 **Important**: The number of sampling points `<n>`, given from command line, must be divisible by the number of `<threads>`.
 
 ### Presentation of experiments and analysis
+Below, we provide the results for various numbers of threads and sampling points. The horizontal axis is presented logarithmically to improve visibility.
 
-Below, we present the results for various numbers of threads and `<n>` values. The horizontal axis is logarithmic to enhance visibility. 
-
-Speciffically, we executed the program with every combination of the following parameters:
+Specifically, we executed the program with every combination of the following parameters:
 - `<threads>`: `[1, 2, 4, 8, 16, 32]`
 - `<n>`: `[1e7, 1e8, 1e9, 5e9, 1e10]`
 
-To perform this grid search and produce the corresponding plot, we created the script `plots.py`. To reproduce, run:
+To conduct this grid search and generate the corresponding plot, we developed the script `plots.py`. To reproduce, execute:
 ```bash
 $ cd monte_carlo
 $ make all
@@ -49,17 +48,17 @@ $ make all
 $ ./monte_carlo <threads> <n>
 ```
 
-Experiments were conducted locally with the following specs:
+Experiments were conducted locally using the following specifications:
 - **OS**: `WSL: Ubuntu-22.04`
-- **CPU**: `Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz 2.59 GHz`, which has `6` cores with `2` threads each.
+- **CPU**: `Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz 2.59 GHz`, featuring `6` cores with `2` threads each.
 
 <div style="text-align:center;">
 <img src="./monte_carlo/output/plot.png" alt="Comparison Plots" width="60%">
 </div>
 
 We make the following observations:
-- Doubling the number of threads results in reduction of the execution time by half, as expected due to the shared workload across multiple threads.
-- Beyond `12` threads, more threads do not lead to a reduction in execution time.
+- **Doubling** the number of threads results in **reduction** of the execution time by *half*, as expected due to the shared workload across multiple threads.
+- In our configuration, featuring `6` cores with `2` threads each and totaling `12` threads (the maximum number of processor threads), we observe improvement up to the use of `12` threads. However, increasing the thread count beyond `12` does **not** yield further reductions in execution time.
 
 ## Exercise 1.2
 
@@ -149,6 +148,7 @@ For this combinations of parameters, no false sharing is noticeable.
 ## Exercise 1.3
 
 ### Description of the problem
+The task of this exercise is to implement our own *read-write* locks to control the respective threads. We need to implement two approaches: locks where *priority* is given to **reading** threads and locks where *priority* is given to **writing** threads. A linked list program from the provided book -which utilizes `Pthread` read-write locks- is provided for modification to incorporate our custom locks.
 
 ### Brief description of the solution
 
