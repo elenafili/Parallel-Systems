@@ -32,11 +32,11 @@ combs = [x + [thread] for x in combs for thread in threads]
 
 output_csv = './output/results.csv'
 
-with open(output_csv, 'w') as file:
-    file.write('method,threads,padding,time,m,n,p\n')
+# with open(output_csv, 'w') as file:
+#     file.write('method,threads,padding,time,m,n,p\n')
 
-for params in combs:
-    process = subprocess.run(list(params) + [output_csv])
+# for params in combs:
+#     process = subprocess.run(list(params) + [output_csv])
 
 
 for dfs_dim in [group for _, group in pd.read_csv(output_csv).groupby(['m', 'n', 'p'])]:
@@ -48,13 +48,15 @@ for dfs_dim in [group for _, group in pd.read_csv(output_csv).groupby(['m', 'n',
 
         fig, ax = plt.subplots()
         ax.grid(visible=True)
-        ax.set_title(f'm={m}, n={n}, p={p}, padding={pad}')
+        # ax.set_title(f'm={m}, n={n}, p={p}, padding={pad}')
+        ax.set_title(f'm={m}, n={n}, p={p}')
         ax.set_xlabel('method')
         ax.set_ylabel('time (sec)')
 
         for df in [group for _, group in dfs_dim.groupby('threads')]:
             uniq_df = df[df['padding'].isin([0, int(pad)])]
-            ax.plot(uniq_df['method'], uniq_df['time'], '.-', label=f'Threads: {df["threads"].values[0]}')
+            ax.plot(uniq_df['method'].apply(lambda x : x if x != 'padding' else f'padding={pad}'), 
+                    uniq_df['time'], '.-', label=f'Threads: {df["threads"].values[0]}')
 
         ax.legend(loc="best")
         plt.savefig(f'./output/plot{m}-{n}-{p}-{pad}.png', bbox_inches='tight')
