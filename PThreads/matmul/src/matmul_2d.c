@@ -139,7 +139,7 @@ int main(const int argc, const char* argv[]) {
     if (argc == 6) {
         FILE* file = fopen(argv[5], "a");
 
-        fprintf(file, "2d,%ld,%f\n", threads, finish - start);
+        fprintf(file, "2d,%ld,0,%f,%ld,%ld,%ld\n", threads, finish - start, m, n, p);
 
         fclose(file);
     }

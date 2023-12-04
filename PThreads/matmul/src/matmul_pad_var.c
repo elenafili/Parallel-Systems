@@ -150,7 +150,7 @@ int main(const int argc, const char* argv[]) {
     if (argc == 7) {
         FILE* file = fopen(argv[6], "a");
 
-        fprintf(file, "padding,%ld,%f\n", threads, finish - start);
+        fprintf(file, "padding,%ld,%ld,%f,%ld,%ld,%ld\n", threads, pad, finish - start, m, n, p);
 
         fclose(file);
     }

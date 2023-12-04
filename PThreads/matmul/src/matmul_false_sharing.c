@@ -134,7 +134,7 @@ int main(const int argc, const char* argv[]) {
     if (argc == 6) {
         FILE* file = fopen(argv[5], "a");
 
-        fprintf(file, "false sharing,%ld,%f\n", threads, finish - start);
+        fprintf(file, "false sharing,%ld,0,%f,%ld,%ld,%ld\n", threads, finish - start, m, n, p);
 
         fclose(file);
     }
