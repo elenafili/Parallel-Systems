@@ -52,6 +52,7 @@ Experiments were conducted locally using the following specifications:
 - **OS**: `WSL: Ubuntu-22.04`
 - **CPU**: `Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz 2.59 GHz`, featuring `6` cores with `2` threads each.
 
+
 <div style="text-align:center;">
 <img src="./monte_carlo/output/plot.png" alt="Comparison Plots" width="60%">
 </div>
@@ -106,12 +107,11 @@ Experiments were conducted locally using the following specifications:
 - **CPU**: `Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz 2.59 GHz`, which has `6` cores with `2` threads each.
 
 #### Performance
-
-Regardless of dimension sizes and the number of threads, the methods, ranked from slowest to fastest on average, are: `2D < false sharing < private variable < padding`
+Regardless of dimension sizes and the number of threads, the methods' ranking (from slowest to fastest on average) is: `2D < false sharing < private variable < padding`
 
 #### Dimensions: $m = n = 8000, p = 1/2/4/8/80$ 
+It is evident that the effect of any possible *false sharing* is **negligible** across all padding sizes and for all values of `p`.
 
-It is evident that the effect of any possible false sharing is negligible across all padding sizes and for all values of `p`.
 
 <div style="text-align:center;">
 <img src="./matmul/output/plot8000-8000-80-2.png" alt="Comparison Plots" width="60%">
@@ -122,8 +122,7 @@ It is evident that the effect of any possible false sharing is negligible across
 </div>
 
 #### Dimensions: $m = 8, n = 8000000, p = 1/2$ 
-
-In this case, false sharing is noticeable. Upon examining the plots, we observe the following:
+In this case, *false sharing* is **noticeable**. Upon examining the plots, we observe the following:
 - **False Sharing**: As expected, this naive approach exhibits a substantial amount of false sharing.  
 - **2D**: Surprisingly, this method did not eliminate false sharing for all parameter combinations. Specifically, for $p=1$ and $p=2$, false sharing can be noticed when utilizing `8` threads. Additionally, this approach is slower and, therefore, **not** a good choice.
 - **Private Variable**: This method is perhaps the simplest solution to make false sharing negligible. It works for every combination of parameters.
@@ -137,7 +136,7 @@ In this case, false sharing is noticeable. Upon examining the plots, we observe 
 
 #### Dimensions: $m = 8, n = 8000000, p = 4/8$ 
 
-For this combinations of parameters, no false sharing is noticeable.
+For these combinations of parameters, **no** *false sharing* is noticeable.
 
 
 <div style="text-align:center;">
