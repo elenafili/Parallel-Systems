@@ -29,6 +29,9 @@ The parallel version of the algorithm is executed when the command line argument
 
 ### Presentation of experiments and analysis
 
+<div style="text-align:center;">
+<img src="./monte_carlo/output/plot.png" alt="Comparison Plots" width="60%">
+</div>
 
 ## Exercise 1.2
 
@@ -41,9 +44,25 @@ The goal of this exercise is to implement a parallel **matrix multiplication** p
 In this implementation, we **flatten** the `2D` matrices into `1D` vectors and perform the multiplication accordingly. The total computations are divided among the threads, with each one handling the computations for a specific number of consecutive rows.
 
 #### matmul_2d.c
-Here we handle the matrices as `2D` arrays
+Here we store the matrices as `2D` constructs, where each row is **allocated independently** in the *heap* and is handled accordingly during the multiplication.
 
 #### matmul_pad_var.c
+In this implementation, we **flatten** the `2D` matrices into `1D` vectors but insert a specified amount of **padding rows** between the actual rows in an attempt to eliminate false sharing. 
 
-#### matmul_private_var.c2D
+#### matmul_private_var.c
 Matrices are stored in memory and handled as in `matmul_false_sharing.c`. This method differs from the previously mentioned, as it uses one local variable in the stack to calculate the sum for a specific row and column. After the sum is computed, the value is assigned to the corresponding position in the array.
+
+**Important**: 
+- The dimension `<m>`, given from command line, must be divisible by the number of `<threads>`.
+- To verify the results of the multiplication, compile with `-DVERIFY`, run the desired algorithm, and then execute the script `verify.py` with the appropriate parameters (`<m> <n> <p>`).
+
+### Presentation of experiments and analysis
+
+## Exercise 1.3
+
+### Description of the problem
+
+### Brief description of the solution
+
+### Presentation of experiments and analysis
+
