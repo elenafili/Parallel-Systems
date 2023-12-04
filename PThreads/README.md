@@ -85,9 +85,9 @@ Matrices are stored in memory and handled as in `matmul_false_sharing.c`. This m
 
 ### Presentation of experiments and analysis
 
-Below, we present the results for the paramaters mentioned in the assignment. For the padding method, the following pad sizes where used: `[2, 4, 8, 16]`
+Below, we provide the results for the paramaters mentioned in the assignment. For the padding method, the following pad sizes where used: `[2, 4, 8, 16]`
 
-To perform this grid search and produce the corresponding plot, we created the script `plots.py`. To reproduce, run:
+To perform this grid search and produce the corresponding plot, we created the script `plots.py`. To reproduce, execute:
 ```bash
 $ cd mat_mul
 $ make all
@@ -101,7 +101,7 @@ $ make all
 $ ./<algo> <m> <n> <p> <pad, when appropriate> <threads>
 ```
 
-Experiments were conducted locally with the following specs:
+Experiments were conducted locally using the following specifications:
 - **OS**: `WSL: Ubuntu-22.04`
 - **CPU**: `Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz 2.59 GHz`, which has `6` cores with `2` threads each.
 
