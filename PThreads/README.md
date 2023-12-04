@@ -29,9 +29,37 @@ The parallel version of the algorithm is executed when the command line argument
 
 ### Presentation of experiments and analysis
 
+Below, we present the results for various numbers of threads and `<n>` values. The horizontal axis is logarithmic to enhance visibility. 
+
+Speciffically, we executed the program with every combination of the following parameters:
+- `<threads>`: `[1, 2, 4, 8, 16, 32]`
+- `<n>`: `[1e7, 1e8, 1e9, 5e9, 1e10]`
+
+To perform this grid search and produce the corresponding plot, we created the script `plots.py`. To reproduce, run:
+```bash
+$ cd monte_carlo
+$ make all
+$ python ./plots.py
+```
+
+To perform manual executions, run:
+```bash
+$ cd monte_carlo
+$ make all
+$ ./monte_carlo <threads> <n>
+```
+
+Experiments were conducted locally with the following specs:
+- **OS**: `WSL: Ubuntu-22.04`
+- **CPU**: `Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz 2.59 GHz`, which has `6` cores with `2` threads each.
+
 <div style="text-align:center;">
 <img src="./monte_carlo/output/plot.png" alt="Comparison Plots" width="60%">
 </div>
+
+We make the following observations:
+- Doubling the number of threads results in reduction of the execution time by half, as expected due to the shared workload across multiple threads.
+- Beyond `12` threads, more threads do not lead to a reduction in execution time.
 
 ## Exercise 1.2
 

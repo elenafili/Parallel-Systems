@@ -19,7 +19,8 @@ PRIV_VAR_SRCS  :=  ./src/matmul_private_var.c $(COMMON_SRCS)
 PRIV_VAR_OBJS  := $(subst .c,.o,$(PRIV_VAR_SRCS))
 
 DEFINES = FIX
-CFLAGS := -std=c11 -Wall -Wextra -I$(COMMON_INCS) -D$(DEFINES)
+CFLAGS := -Wall -Wextra -I$(COMMON_INCS) -D$(DEFINES)
+LDFLAGS += -pthread
 
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c $^ -o $@
@@ -29,16 +30,16 @@ clean:
 	@rm -f fs 2d pad_var priv_var
 
 fs: $(FALSE_OBJS)
-	$(CC) $^ -o ./fs
+	$(CC) -pthread $^ -o ./fs
 
 2d: $(2D_OBJS)
-	$(CC) $^ -o ./2d
+	$(CC) -pthread $^ -o ./2d
 
 pad_var: $(PAD_VAR_SRCS)
-	$(CC) $^ -o ./pad_var
+	$(CC) -pthread $^ -o ./pad_var
 
 priv_var: $(PRIV_VAR_OBJS)
-	$(CC) -lpthread $^ -o ./priv_var
+	$(CC) -pthread $^ -o ./priv_var
 
 all: 
 	make -s fs
