@@ -66,10 +66,11 @@ void* worker(void* args_) {
     register size_t C_sub = args->start * p, A_sub = args->start * n;
 
     for (size_t i = args->start; i < args->end; i++, A_sub += n) { 
-
+            
         for (size_t j = 0; j < p; j++, C_sub++) {
             
             C[C_sub] = 0;
+            
             for (size_t k = 0; k < n; k++)
                 C[C_sub] += A[A_sub + k] * B[k * p + j];
         }
@@ -95,7 +96,7 @@ void compute() {
 
     for (size_t i = 0; i < threads; i++)
         ASSERT(pthread_join(tids[i], NULL));
-
+        
     free(args);
     free(tids);
 }

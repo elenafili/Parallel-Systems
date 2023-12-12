@@ -22,10 +22,10 @@ clean:
 	@rm -f rp wp
 
 rp: $(RP_OBJS)
-	$(CC) -lpthread $^ -o ./rp
+	$(CC) -pthread $^ -o ./rp
 
 wp: $(WP_OBJS)
-	$(CC) -lpthread $^ -o ./wp
+	$(CC) -pthread $^ -o ./wp
 
 all: 
 	make -s rp

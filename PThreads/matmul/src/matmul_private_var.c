@@ -69,7 +69,8 @@ void* worker(void* args_) {
 
         for (size_t j = 0; j < p; j++, C_sub++) {
             
-            register size_t temp = 0;
+            double temp = 0;
+
             for (size_t k = 0; k < n; k++)
                 temp += A[A_sub + k] * B[k * p + j];
             

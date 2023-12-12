@@ -33,10 +33,16 @@ with open(output_csv, 'w') as file:
     file.write('method,threads,padding,time,m,n,p\n')
 
 for params in combs:
-    process = subprocess.run(list(params) + [output_csv])
+    for _ in range(4):
+        subprocess.run(list(params) + [output_csv])
 
+subset = ['method', 'threads', 'padding', 'm', 'n', 'p']
+df_mean = pd.read_csv(output_csv)
+df_mean['time'] = df_mean.groupby(subset)['time'].transform('mean')
+df_mean.drop_duplicates(subset=subset, keep='first', inplace=True) 
+df_mean = df_mean.reset_index(drop=True)
 
-for dfs_dim in [group for _, group in pd.read_csv(output_csv).groupby(['m', 'n', 'p'])]:
+for dfs_dim in [group for _, group in df_mean.groupby(['m', 'n', 'p'])]:
     m = dfs_dim["m"].values[0]
     n = dfs_dim["n"].values[0]
     p = dfs_dim["p"].values[0]
@@ -56,5 +62,21 @@ for dfs_dim in [group for _, group in pd.read_csv(output_csv).groupby(['m', 'n',
 
         ax.legend(loc="best")
         plt.savefig(f'./output/plot{m}-{n}-{p}-{pad}.png', bbox_inches='tight')
+        plt.close()
+
+        fig, ax = plt.subplots()
+        ax.grid(visible=True)
+        ax.set_title(f'm={m}, n={n}, p={p}')
+        ax.set_xlabel('method')
+        ax.set_ylabel('time (sec)')
+
+        for df in [group for _, group in dfs_dim.groupby('method')]:
+            df['method'] = df['method'].apply(lambda x : x if x != 'padding' else f'padding={pad}')
+            uniq_df = df[df['padding'].isin([0, int(pad)])]
+            ax.plot(uniq_df['threads'], 
+                    uniq_df['time'], '.-', label=f'Method: {df["method"].values[0]}')
+
+        ax.legend(loc="best")
+        plt.savefig(f'./output/plot{m}-{n}-{p}-{pad}_t.png', bbox_inches='tight')
         plt.close()
 

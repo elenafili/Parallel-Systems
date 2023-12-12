@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
     GET_TIME(finish);
 
     double threaded_time = finish - start;
-    fprintf(stdout, "|     %ld     | %.8f | %13.8f |\n", threads, pi, threaded_time);
+    fprintf(stdout, "|    %2ld     | %.8f | %13.8f |\n", threads, pi, threaded_time);
 
     fprintf(stdout, "+-----------+------------+---------------+\n");
 
