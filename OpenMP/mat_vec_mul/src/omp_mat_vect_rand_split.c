@@ -249,7 +249,7 @@ void Read_vector(char* prompt, double x[], size_t n) {
 #define LOOP                           		\
 	for (i = 0; i < n; i++) {    			\
 		y[i] = 0.0;                      	\
-		for (j = 0; j < n; j++) { 			\
+		for (j = i; j < n; j++) { 			\
 			temp = A[i * n + j] * x[j];   	\
 			y[i] += temp;                 	\
 		}                                	\
