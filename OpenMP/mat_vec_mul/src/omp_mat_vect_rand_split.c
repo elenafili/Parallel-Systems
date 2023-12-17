@@ -49,14 +49,14 @@
 #include "timer.h"
 
 typedef enum {
-   AUTO,
-   STATIC,
-   STATIC_CS,
-   DYNAMIC,
-   DYNAMIC_CS,
-   GUIDED,
-   GUIDED_CS,
-   RUNTIME
+	AUTO,
+	STATIC,
+	STATIC_CS,
+	DYNAMIC,
+	DYNAMIC_CS,
+	GUIDED,
+	GUIDED_CS,
+	RUNTIME
 } SCH;
 
 /* Serial functions */
@@ -71,83 +71,82 @@ void Print_vector(char* title, double y[], double n);
 
 /* Parallel function */
 void Omp_mat_vect(double A[], double x[], double y[], 
-                  size_t n, size_t thread_count, SCH sch_type, size_t chunk_size);
+				size_t n, size_t thread_count, SCH sch_type, size_t chunk_size);
 
 
 void write_vector(double* vec, const size_t n, const char* path) {
 
-    int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+	int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
 
-    if (fd == -1) {
-        perror("Error opening file");
-        exit(EXIT_FAILURE);
+	if (fd == -1) {
+		perror("Error opening file");
+		exit(EXIT_FAILURE);
     }
 	
 	write(fd, vec, n * sizeof(double));
 
-    close(fd);
+	close(fd);
 }
 
 /*------------------------------------------------------------------*/
 int main(int argc, char* argv[]) {
-   double* A;
-   double* x;
-   double* y;
-   SCH sch_type;
-   size_t n, thread_count, chunk_size;
+	double* A;
+	double* x;
+	double* y;
+	SCH sch_type;
+	size_t n, thread_count, chunk_size;
 
-   Get_args(argc, argv, &thread_count, &n, &sch_type, &chunk_size);
+	Get_args(argc, argv, &thread_count, &n, &sch_type, &chunk_size);
 
-   A = malloc(n*n*sizeof(double));
-   x = malloc(n*sizeof(double));
-   y = malloc(n*sizeof(double));
+	A = malloc(n*n*sizeof(double));
+	x = malloc(n*sizeof(double));
+	y = malloc(n*sizeof(double));
    
-#  ifdef DEBUG
-   Read_matrix("Enter the matrix", A, n);
-   Print_matrix("We read", A, n);
-   Read_vector("Enter the vector", x, n);
-   Print_vector("We read", x, n);
-#  else
-   Gen_matrix(A, n);
-/* Print_matrix("We generated", A, n); */
-   Gen_vector(x, n);
-/* Print_vector("We generated", x, n); */
-#  endif
+	#ifdef DEBUG
+		Read_matrix("Enter the matrix", A, n);
+		Print_matrix("We read", A, n);
+		Read_vector("Enter the vector", x, n);
+		Print_vector("We read", x, n);
+	#else
+	Gen_matrix(A, n);
+	/* Print_matrix("We generated", A, n); */
+	Gen_vector(x, n);
+	/* Print_vector("We generated", x, n); */
+	#endif
+
+	double start, finish;
+
+	GET_TIME(start);
+	Omp_mat_vect(A, x, y, n, thread_count, sch_type, chunk_size);
+	GET_TIME(finish);
+
+	#ifdef DEBUG
+	Print_vector("The product is", y, n);
+	#else
+	/* Print_vector("The product is", y, n); */
+	#endif
 
 
-    double start, finish;
+	#ifdef VERIFY
+		write_vector(A, n * n, "./files/A.bin");
+		write_vector(x, n, "./files/x.bin");
+		write_vector(y, n, "./files/y.bin");
+	#endif
 
-    GET_TIME(start);
-   	Omp_mat_vect(A, x, y, n, thread_count, sch_type, chunk_size);
-    GET_TIME(finish);
+	if (argc == 6) {
+		FILE* file = fopen(argv[5], "a");
 
-#  ifdef DEBUG
-   Print_vector("The product is", y, n);
-#  else
-/* Print_vector("The product is", y, n); */
-#  endif
+		fprintf(file, "%d,%ld,%ld,%f\n", sch_type, chunk_size, thread_count, finish - start);
 
+		fclose(file);
+	}
 
-    #ifdef VERIFY
-        write_vector(A, n * n, "./files/A.bin");
-        write_vector(x, n, "./files/x.bin");
-        write_vector(y, n, "./files/y.bin");
-    #endif
+	free(A);
+	free(x);
+	free(y);
 
-    if (argc == 6) {
-        FILE* file = fopen(argv[5], "a");
-
-        fprintf(file, "%d,%ld,%ld,%f\n", sch_type, chunk_size, thread_count, finish - start);
-
-        fclose(file);
-    }
-
-   free(A);
-   free(x);
-   free(y);
-
-   return 0;
-}  /* main */
+	return 0;
+	}  /* main */
 
 
 /*------------------------------------------------------------------
@@ -157,15 +156,17 @@ int main(int argc, char* argv[]) {
  * Out args:  thread_count_p, m_p, n_p
  */
 void Get_args(int argc, char* argv[], size_t* thread_count_p, size_t* n_p, SCH* sch_type, size_t* chunk_size)  {
+	if (argc < 5) Usage(argv[0]);
 
-   if (argc < 5) Usage(argv[0]);
-   *thread_count_p = strtol(argv[1], NULL, 10);
-   *n_p = strtol(argv[2], NULL, 10);
-   size_t temp = strtol(argv[3], NULL, 10);
-   *sch_type = temp > 7 ? 0 : temp;
-   *chunk_size = strtol(argv[4], NULL, 10);
-   if (*thread_count_p <= 0 || *n_p <= 0) Usage(argv[0]);
+	*thread_count_p = strtol(argv[1], NULL, 10);
+	*n_p = strtol(argv[2], NULL, 10);
 
+	size_t temp = strtol(argv[3], NULL, 10);
+
+	*sch_type = temp > 7 ? 0 : temp;
+	*chunk_size = strtol(argv[4], NULL, 10);
+
+	if (*thread_count_p <= 0 || *n_p <= 0) Usage(argv[0]);
 }  /* Get_args */
 
 /*------------------------------------------------------------------
@@ -175,8 +176,8 @@ void Get_args(int argc, char* argv[], size_t* thread_count_p, size_t* n_p, SCH* 
  * In arg :   prog_name
  */
 void Usage (char* prog_name) {
-   fprintf(stderr, "usage: %s <thread_count> <n> <schedule> <chunk_size> <log file, optional>\n", prog_name);
-   exit(0);
+	fprintf(stderr, "usage: %s <thread_count> <n> <schedule> <chunk_size> <log file, optional>\n", prog_name);
+	exit(0);
 }  /* Usage */
 
 /*------------------------------------------------------------------
@@ -186,10 +187,11 @@ void Usage (char* prog_name) {
  * Out arg:     A
  */
 void Read_matrix(char* prompt, double A[], size_t n) {
-   printf("%s\n", prompt);
-   for (size_t i = 0; i < n; i++) 
-      for (size_t j = 0; j < n; j++)
-         scanf("%lf", &A[i*n+j]);
+	printf("%s\n", prompt);
+
+	for (size_t i = 0; i < n; i++) 
+		for (size_t j = 0; j < n; j++)
+			scanf("%lf", &A[i*n+j]);
 }  /* Read_matrix */
 
 /*------------------------------------------------------------------
@@ -200,16 +202,16 @@ void Read_matrix(char* prompt, double A[], size_t n) {
  * Out arg:  A
  */
 void Gen_matrix(double A[], size_t n) {
-   unsigned int seed = 8;
-   for (size_t i = 0; i < n; i++) {
-      
-      for (size_t j = 0; j < i; j++)
-         A[i * n + j] = 0;
+	unsigned int seed = 8;
+	for (size_t i = 0; i < n; i++) {
+		
+		for (size_t j = 0; j < i; j++)
+			A[i * n + j] = 0;
 
-      for (size_t j = i; j < n; j++)
-         A[i * n + j] = my_drand(&seed);
+		for (size_t j = i; j < n; j++)
+			A[i * n + j] = my_drand(&seed);
 
-   }
+	}
 }  /* Gen_matrix */
 
 /*------------------------------------------------------------------
@@ -220,9 +222,9 @@ void Gen_matrix(double A[], size_t n) {
  * Out arg:  A
  */
 void Gen_vector(double x[], size_t n) {
-   unsigned int seed = 9;
-   for (size_t i = 0; i < n; i++)
-      x[i] = my_drand(&seed);
+	unsigned int seed = 9;
+	for (size_t i = 0; i < n; i++)
+		x[i] = my_drand(&seed);
 }  /* Gen_vector */
 
 /*------------------------------------------------------------------
@@ -232,9 +234,9 @@ void Gen_vector(double x[], size_t n) {
  * Out arg:         x
  */
 void Read_vector(char* prompt, double x[], size_t n) {
-   printf("%s\n", prompt);
-   for (size_t i = 0; i < n; i++) 
-      scanf("%lf", &x[i]);
+	printf("%s\n", prompt);
+	for (size_t i = 0; i < n; i++) 
+		scanf("%lf", &x[i]);
 }  /* Read_vector */
 
 
@@ -244,21 +246,20 @@ void Read_vector(char* prompt, double x[], size_t n) {
  * In args:   A, x, m, n, thread_count
  * Out arg:   y
  */
-#define LOOP                           \
+#define LOOP                           		\
 	for (i = 0; i < n; i++) {    			\
-		y[i] = 0.0;                      \
+		y[i] = 0.0;                      	\
 		for (j = 0; j < n; j++) { 			\
-			temp = A[i * n + j] * x[j];   \
-			y[i] += temp;                 \
-		}                                \
-	}                                   \
-
+			temp = A[i * n + j] * x[j];   	\
+			y[i] += temp;                 	\
+		}                                	\
+	}                                   	\
 
 void Omp_mat_vect(double A[], double x[], double y[], 
-                  size_t n, size_t thread_count, SCH sch_type, size_t chunk_size) {
-   	double temp;
+				size_t n, size_t thread_count, SCH sch_type, size_t chunk_size) {
+	double temp;
 	size_t i, j;
-   
+
 	switch (sch_type) {
 		case AUTO:
 			#pragma omp parallel for num_threads(thread_count) default(none) \
@@ -311,12 +312,12 @@ void Omp_mat_vect(double A[], double x[], double y[],
  * In args:     title, A, m, n
  */
 void Print_matrix( char* title, double A[], size_t n) {
-   printf("%s\n", title);
-   for (size_t i = 0; i < n; i++) {
-      for (size_t j = 0; j < n; j++)
-         printf("%4.1f ", A[i*n + j]);
-      printf("\n");
-   }
+	printf("%s\n", title);
+	for (size_t i = 0; i < n; i++) {
+		for (size_t j = 0; j < n; j++)
+			printf("%4.1f ", A[i*n + j]);
+		printf("\n");
+	}
 }  /* Print_matrix */
 
 
@@ -326,8 +327,8 @@ void Print_matrix( char* title, double A[], size_t n) {
  * In args:     title, y, m
  */
 void Print_vector(char* title, double y[], double m) {
-   printf("%s\n", title);
-   for (size_t i = 0; i < m; i++)
-      printf("%4.1f ", y[i]);
-   printf("\n");
+	printf("%s\n", title);
+	for (size_t i = 0; i < m; i++)
+		printf("%4.1f ", y[i]);
+	printf("\n");
 }  /* Print_vector */
