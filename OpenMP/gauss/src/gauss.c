@@ -7,6 +7,7 @@
 #include <sys/stat.h>
 
 #include <omp.h>
+#include <assert.h>
 
 #include "my_rand.h"
 #include "timer.h"
@@ -27,10 +28,11 @@ void write_matrix(double** mat, const size_t n, const char* path) {
     }
 	
 	for (size_t i = 0; i < n; i++)
-		write(fd, mat[i], n * sizeof(double));
+		assert(write(fd, mat[i], n * sizeof(double)) > 0);
 
     close(fd);
 }
+
 void write_vector(double* vec, const size_t n, const char* path) {
 
     int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
@@ -40,7 +42,7 @@ void write_vector(double* vec, const size_t n, const char* path) {
         exit(EXIT_FAILURE);
     }
 	
-	write(fd, vec, n * sizeof(double));
+    assert(write(fd, vec, n * sizeof(double)) > 0);
 
     close(fd);
 }
@@ -81,13 +83,9 @@ int main(int argc, char* argv[]) {
 	gauss(1);
     GET_TIME(finish1);
 
-    printf("Trigonalization: %.4f sec\n", finish1 - start1);
-
     GET_TIME(start2);
 	gauss(0);
     GET_TIME(finish2);
-
-    printf("Solution: %.4f sec\n", finish2 - start2);
 
     #ifdef VERIFY
         write_matrix(A, n, "./files/A_trig.bin");
@@ -95,12 +93,24 @@ int main(int argc, char* argv[]) {
         write_vector(x, n, "./files/x.bin");
     #endif
 
-    if (argc == 6) {
-        // FILE* file = fopen(argv[5], "a");
+    size_t id = 0;
 
-        // fprintf(file, "%d,%ld,%ld,%f,%f\n", thread_count, finish - start);
+    #ifdef TRI1
+        id = 2;
+    #endif
+    #ifdef TRI2
+        id = 4;
+    #endif
+    #ifdef REV
+        id++;
+    #endif
 
-        // fclose(file);
+    if (argc == 4) {
+        FILE* file = fopen(argv[3], "a");
+
+        fprintf(file, "%ld,%ld,%f,%f,%ld\n", n, thread_count, finish1 - start1, finish2 - start2, id);
+
+        fclose(file);
     }
 
    free(A);
