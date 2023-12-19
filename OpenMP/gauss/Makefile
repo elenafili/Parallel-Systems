@@ -16,6 +16,6 @@ clean:
 
 .PHONY: gauss
 
-gauss: CFLAGS += $(FLAG)
+gauss: CFLAGS += $(FLAGS)
 gauss: $(GAUSS_OBJS)
 	$(CC) -fopenmp $^ -o ./gauss
