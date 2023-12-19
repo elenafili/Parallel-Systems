@@ -7,7 +7,7 @@ INC	 := ./include/
 GAUSS_SRCS  :=  ./src/gauss.c ./src/my_rand.c 
 GAUSS_OBJS  := $(subst .c,.o,$(GAUSS_SRCS))
 
-DEFINES = -DVERIFY -DTRI1 -DTRI2
+DEFINES = -DVERIFY -DTRI2 -DREV # -DTRI1 -DTRI2 -DREV
 CFLAGS := -fopenmp -Wall -Wextra -I$(INC) $(DEFINES) -std=c11 -O3 
 
 %.o: %.cpp

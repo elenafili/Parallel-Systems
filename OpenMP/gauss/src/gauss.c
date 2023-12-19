@@ -74,15 +74,20 @@ int main(int argc, char* argv[]) {
     #endif
 
 
-    // double start, finish;
+    double start1, finish1;
+    double start2, finish2;
 
-    // GET_TIME(start);
+    GET_TIME(start1);
 	gauss(1);
-    // GET_TIME(finish);
+    GET_TIME(finish1);
 
-    // GET_TIME(start);
+    printf("Trigonalization: %.4f sec\n", finish1 - start1);
+
+    GET_TIME(start2);
 	gauss(0);
-    // GET_TIME(finish);
+    GET_TIME(finish2);
+
+    printf("Solution: %.4f sec\n", finish2 - start2);
 
     #ifdef VERIFY
         write_matrix(A, n, "./files/A_trig.bin");
@@ -167,15 +172,37 @@ void gauss(uint8_t bool) {
 		}
 	}
 	else {
-		for (size_t temp = 0, row = n - 1; temp < n; row--, temp++) {
-			x[row] = b[row];
+        #ifdef REV
+            double sum;
 
-            for (size_t col = row + 1; col < n; col++)
+            #pragma omp parallel num_threads(thread_count)
+            for (size_t temp = 0, row = n - 1; temp < n; row--, temp++) {
+                
+                #pragma omp single 
+                {
+                    sum = 0;
+                }
+
+                #pragma omp for reduction(+: sum)
+                for (size_t col = row + 1; col < n; col++)
+                    sum += A[row][col] * x[col];
+                
+                #pragma omp single 
+                {
+                    x[row] = (b[row] - sum) / A[row][row];
+                }
+            }
+        #else
+            for (size_t temp = 0, row = n - 1; temp < n; row--, temp++) {
+                x[row] = b[row];
+
+                for (size_t col = row + 1; col < n; col++)
                     x[row] -= A[row][col] * x[col];
-            
-
-			x[row] /= A[row][row];
-		}
+                
+                x[row] /= A[row][row];
+            }
+        #endif
 	}
 }
 
+// PS1='${PWD##*/} $ '

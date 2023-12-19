@@ -42,7 +42,7 @@ double serial_pi(LONG n) {
 double threaded_pi(size_t threads, LONG n) {
     LONG arrows = 0;
     
-    #pragma omp parallel num_threads(threads) \
+	#pragma omp parallel num_threads(threads) \
     reduction(+: arrows)
     {
         double range = (1.0 - (-1.0)); 
