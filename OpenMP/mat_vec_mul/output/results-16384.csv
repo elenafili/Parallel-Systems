@@ -1,4 +1,4 @@
-scl_type,chunk_size,threads,time
+sch_type,chunk_size,threads,time
 0,0,1,0.424369
 0,0,1,0.432230
 0,0,1,0.412677
