@@ -1,21 +1,21 @@
-# Compiler
-CC = gcc
 
 # Paths
-INC	 := ./include/
+INC := ./include/
 
-GAUSS_SRCS  :=  ./src/gauss.c ./src/my_rand.c 
-GAUSS_OBJS  := $(subst .c,.o,$(GAUSS_SRCS))
+GAUSS_SRCS := ./src/gauss.c ./src/my_rand.c
+GAUSS_OBJS := $(subst .c,.o,$(GAUSS_SRCS))
 
-DEFINES = -DVERIFY -DTRI2 -DREV # -DTRI1 -DTRI2 -DREV
-CFLAGS := -fopenmp -Wall -Wextra -I$(INC) $(DEFINES) -std=c11 -O3 
+CFLAGS := -fopenmp -Wall -Wextra -I$(INC) -std=c11 -O3
 
-%.o: %.cpp
+%.o: %.c
 	$(CC) $(CFLAGS) -c $^ -o $@
 
 clean:
 	@rm -f $(GAUSS_OBJS)
 	@rm -f gauss
 
+.PHONY: gauss
+
+gauss: CFLAGS += $(FLAG)
 gauss: $(GAUSS_OBJS)
 	$(CC) -fopenmp $^ -o ./gauss
