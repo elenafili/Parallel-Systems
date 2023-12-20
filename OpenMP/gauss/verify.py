@@ -17,8 +17,21 @@ b = np.fromfile('./files/b.bin', dtype=np.float64).reshape(n)
 
 print(f'|Ax - b|_1 = {np.sum(np.abs(A @ x - b))}')
 
+# for i in range(n):
+#     for j in range(i+1, n):
+#         ratio = A[j][i] / A[i][i]
+#         for k in range(i, n):
+#             A[j][k] -= ratio * A[i][k]
+#             # print(f'{i} {j} {k}: {A[j][k]:.6f} {ratio:.6f} {A[i][k]:.6f}')
+#         b[j] -= ratio * b[i]
 
-# A = np.fromfile('./files/A_trig.bin', dtype=np.float64).reshape(n, n)
-# b = np.fromfile('./files/b_solv.bin', dtype=np.float64).reshape(n)
 # print(A)
 # print(b)
+
+# A1 = np.fromfile('./files/A_trig.bin', dtype=np.float64).reshape(n, n)
+# b1 = np.fromfile('./files/b_solv.bin', dtype=np.float64).reshape(n)
+# print(A1)
+# print(b1)
+
+# print(np.sum(np.abs(A-A1)))
+# print(np.abs(b-b1))

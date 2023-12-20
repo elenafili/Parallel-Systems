@@ -6,19 +6,31 @@ import subprocess
 
 type_map = { 
     0: 'No Parallezation',
-    1: 'Reverse Only',
+    1: 'Back Only',
     2: 'Gauss Elim - Second loop',
-    3: 'Gauss Elim - Third loop',
-    4: 'Gauss Elim - Second loop + Reverse',
-    5: 'Gauss Elim - Third loop + Reverse',
+    3: 'Gauss Elim - Second loop + Back',
+    4: 'Gauss Elim - Third loop',
+    5: 'Gauss Elim - Third loop + Back',
+}
+
+var_map = { 
+    '': 'No Parallezation',
+    '-DBACK': 'Back Only',
+    '-DTRI1': 'Gauss Elim - Second loop',
+    '-DTRI1 -DBACK': 'Gauss Elim - Second loop + Back',
+    '-DTRI2': 'Gauss Elim - Third loop',
+    '-DTRI2 -DBACK': 'Gauss Elim - Third loop + Back',
 }
 
 
-ns = ['1024', '4096']
-threads = ['1', '2', '4', '8', '12', '16']
-vars = ['', '-DTRI1', '-DTRI2', '-DTRI1 -DREV', '-DTRI2 -DREV']
+# ns = ['1024', '4096']
+# threads = ['1', '2', '4', '8', '12']
+ns = ['10240']
+threads = ['1', '2', '4', '8']
+# vars = ['', '-DTRI1', '-DTRI1 -DBACK', '-DTRI2', '-DTRI2 -DBACK']
+vars = ['', '-DTRI1 -DBACK', '-DTRI2 -DBACK']
 
-var_map = { x: type_map[i] for i, x in enumerate([vars[0]] + ['-DREV'] + vars[1:]) }
+# var_map = { x: type_map[i] for i, x in enumerate([vars[0]] + ['-DBACK'] + vars[1:]) }
 
 param_grid = [
     ns,
@@ -26,9 +38,9 @@ param_grid = [
     vars[1:]
 ]
 
-combs = list(itertools.product(*param_grid)) + [(n, '1', '') for n in ns]
+combs = [(n, '1', '') for n in ns] + list(itertools.product(*param_grid))
 
-output_csv = f'./output/results.csv'
+output_csv = f'./output/results1.csv'
 
 with open(output_csv, 'w') as file:
     file.write('n,threads,time_trig,time_rev,type\n')
@@ -41,7 +53,7 @@ for n, threads, var in combs:
         subprocess.run(['./gauss', threads, n, output_csv])
 
 
-subset = ['n', 'threads']
+subset = ['n', 'threads', 'type']
 df_mean = pd.read_csv(output_csv)
 df_mean['time_trig'] = df_mean.groupby(subset)['time_trig'].transform('mean')
 df_mean['time_rev'] = df_mean.groupby(subset)['time_rev'].transform('mean')
@@ -50,18 +62,46 @@ df_mean = df_mean.reset_index(drop=True)
 
 df_mean.to_csv('./output/mean_results.csv', index=False, sep='\t')
 
-print(df_mean)
+df_base = df_mean[df_mean['type'] == 0]
+df_mean = df_mean[df_mean['type'] != 0]
 
-# for dfs_dim in [group for _, group in df_mean.groupby('chunk_size')]:
-#     fig, ax = plt.subplots()
-#     ax.grid(visible=True)
-#     ax.set_xlabel('threads')
-#     ax.set_ylabel('time (sec)')
-#     ax.set_xticks([1] + list(range(2, 17, 2)))
+for type in df_mean['type'].unique():
+    df_base['type'] = type
+    df_mean = pd.concat([df_base, df_mean], ignore_index=True)
 
-#     for df in [group for _, group in dfs_dim.groupby('scl_type')]:
-#         ax.plot(df['threads'], df['time'], '.-', label=f'Scheduling: {df["scl_type"].values[0]}')
+for dfs_dim in [group for _, group in df_mean.groupby('n')]:
+    n = dfs_dim['n'].values[0]
 
-#     ax.legend(loc='best')
-#     plt.savefig(f'./output/plot-{chunk_size}-{n}.png', bbox_inches='tight')
-#     plt.close()
+    fig, ax = plt.subplots()
+    ax.grid(visible=True)
+    ax.set_title(f'Trigonalization, n = {n}')
+    ax.set_xlabel('threads')
+    ax.set_ylabel('time (sec)')
+    ax.set_xticks([1] + list(range(2, 17, 2)))
+
+    # ax.plot(df_base['threads'], df_base['time_trig'], '.-', label='Baseline')
+    for df in [group for _, group in dfs_dim.groupby('type')]:
+        ax.plot(df['threads'], df['time_trig'], '.-', label=type_map[df["type"].values[0]])
+
+    ax.legend(loc='best')
+    plt.savefig(f'./output/plot-trig-{n}.png', bbox_inches='tight')
+    plt.close()
+
+for dfs_dim in [group for _, group in df_mean.groupby('n')]:
+    n = dfs_dim['n'].values[0]
+
+    fig, ax = plt.subplots()
+    ax.grid(visible=True)
+    ax.set_title(f'Back-Substitution, n = {n}')
+    ax.set_xlabel('threads')
+    ax.set_ylabel('time (sec)')
+    ax.set_xticks([1] + list(range(2, 17, 2)))
+
+    # ax.plot(df_base['threads'], df_base['time_rev'], '.-', label='Baseline')
+
+    for df in [group for _, group in dfs_dim.groupby('type')]:
+        ax.plot(df['threads'], df['time_rev'], '.-', label=type_map[df["type"].values[0]])
+
+    ax.legend(loc='best')
+    plt.savefig(f'./output/plot-back-{n}.png', bbox_inches='tight')
+    plt.close()

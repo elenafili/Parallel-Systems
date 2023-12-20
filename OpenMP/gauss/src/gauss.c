@@ -12,6 +12,10 @@
 #include "my_rand.h"
 #include "timer.h"
 
+double* A;
+double* x;
+double* b;
+size_t n, thread_count;
 
 void write_matrix(double** mat, const size_t n, const char* path) {
 
@@ -60,72 +64,84 @@ void Gen_vector(double* x, size_t n) {
 }
 
 
-#ifdef TRI1
-    #define PARALLEL1 _Pragma("omp parallel for num_threads(thread_count)")
-#else
-    #define PARALLEL1
-#endif
-#ifdef TRI2
-    #define PARALLEL2 _Pragma("omp parallel for num_threads(thread_count)")
-#else
-    #define PARALLEL2
-#endif
+void gauss() {
+    size_t i, j, k;
+    double ratio;
+    register size_t off1, off2;
 
-void gauss(uint8_t bool) {	
-	if (bool) {
-		for (size_t i = 0; i < n - 1; i++) {
+    #ifdef TRI1
+    #pragma omp parallel num_threads(thread_count) \
+    default(none) private(i, j, k, ratio, off1, off2) shared(A, b, n)
+    #elif TRI2
+    #pragma omp parallel num_threads(thread_count) \
+    default(none) private(i, j, k) shared(A, b, n, ratio, off1, off2)
+    #endif
+    for (i = 0; i < n - 1; i++) {
 
-			PARALLEL1
-			for (size_t j = i + 1; j < n; j++) {
-				double ratio = A[j][i] / A[i][i];
+        
+        off1 = i * n;
 
-				PARALLEL2
-				for (size_t k = i; k < n; k++)	
-					A[j][k] -= ratio * A[i][k];
-
-				b[j] -= ratio * b[i];
-			}
-		}
-	}
-	else {
-        #ifdef REV
-            double sum;
-
-            #pragma omp parallel num_threads(thread_count)
-            for (size_t temp = 0, row = n - 1; temp < n; row--, temp++) {
-                
-                #pragma omp single 
-                {
-                    sum = 0;
-                }
-
-                #pragma omp for reduction(+: sum)
-                for (size_t col = row + 1; col < n; col++)
-                    sum += A[row][col] * x[col];
-                
-                #pragma omp single 
-                {
-                    x[row] = (b[row] - sum) / A[row][row];
-                }
-            }
-        #else
-            for (size_t temp = 0, row = n - 1; temp < n; row--, temp++) {
-                x[row] = b[row];
-
-                for (size_t col = row + 1; col < n; col++)
-                    x[row] -= A[row][col] * x[col];
-                
-                x[row] /= A[row][row];
-            }
+        #ifdef TRI1
+        #pragma omp for
         #endif
-	}
+        for (j = i + 1; j < n; j++) {
+
+            #if defined(TRI2)
+                #pragma omp single
+                {
+            #endif
+                off2 = j * n;
+                ratio = A[off2 + i] / A[off1 + i];
+                b[j] -= ratio * b[i];
+            #if defined(TRI2)
+                }
+            #endif
+            
+
+            #ifdef TRI2
+            #pragma omp for nowait
+            #endif
+            for (k = i; k < n; k++)
+                A[off2 + k] -= ratio * A[off1 + k];
+            
+        }
+    }
 }
 
+void back() {
+    #ifdef BACK
+        double sum;
 
-double** A;
-double* x;
-double* b;
-size_t n, thread_count;
+        #pragma omp parallel num_threads(thread_count)
+        for (size_t temp = 0, row = n - 1; temp < n; row--, temp++) {
+            
+            #pragma omp single 
+            sum = 0;
+            
+            #pragma omp for reduction(+: sum)
+            for (size_t col = row + 1; col < n; col++)
+                sum += A[row * n + col] * x[col];
+            
+            #pragma omp single 
+            x[row] = (b[row] - sum) / A[row * n + row];
+            
+        }			
+    #else
+        for (size_t temp = 0, row = n - 1; temp < n; row--, temp++) {
+            x[row] = b[row];
+
+            for (size_t col = row + 1; col < n; col++)
+                x[row] -= A[row * n + col] * x[col];
+            
+            x[row] /= A[row * n + row];
+        }
+    #endif
+}
+
+void Usage(char* prog_name) {
+   fprintf(stderr, "usage: %s <thread_count> <n> <schedule> <chunk_size> <log file, optional>\n", prog_name);
+   exit(0);
+}
 
 void Get_args(int argc, char* argv[])  {
 
@@ -139,27 +155,19 @@ void Get_args(int argc, char* argv[])  {
 		Usage(argv[0]);
 }
 
-void Usage (char* prog_name) {
-   fprintf(stderr, "usage: %s <thread_count> <n> <schedule> <chunk_size> <log file, optional>\n", prog_name);
-   exit(0);
-}
-
 int main(int argc, char* argv[]) {
 
 	Get_args(argc, argv);
 
-	A = malloc(n * sizeof(double*));
-	for (size_t i = 0; i < n; i++)
-		A[i] = malloc(n * sizeof(double));
-
+	A = malloc(n * n * sizeof(double));
 	x = malloc(n * sizeof(double));
 	b = malloc(n * sizeof(double));
 	
-	Gen_matrix(A, n);
+	Gen_vector(A, n * n);
 	Gen_vector(b, n);
 
     #ifdef VERIFY
-        write_matrix(A, n, "./files/A.bin");
+        write_vector(A, n * n, "./files/A.bin");
         write_vector(b, n, "./files/b.bin");
     #endif
 
@@ -167,15 +175,17 @@ int main(int argc, char* argv[]) {
     double start2, finish2;
 
     GET_TIME(start1);
-	gauss(1);
+	gauss();
     GET_TIME(finish1);
 
     GET_TIME(start2);
-	gauss(0);
+	back();
     GET_TIME(finish2);
 
+	printf("Trig: %f\nRev:  %f\n", finish1 - start1, finish2 - start2);
+
     #ifdef VERIFY
-        write_matrix(A, n, "./files/A_trig.bin");
+        write_vector(A, n * n, "./files/A_trig.bin");
         write_vector(b, n, "./files/b_solv.bin");
         write_vector(x, n, "./files/x.bin");
     #endif
@@ -188,7 +198,7 @@ int main(int argc, char* argv[]) {
     #ifdef TRI2
         id = 4;
     #endif
-    #ifdef REV
+    #ifdef BACK
         id++;
     #endif
 
