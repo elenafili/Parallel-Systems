@@ -123,8 +123,7 @@ void back() {
                 sum += A[row * n + col] * x[col];
             
             #pragma omp single 
-            x[row] = (b[row] - sum) / A[row * n + row];
-            
+            x[row] = (b[row] - sum) / A[row * n + row];            
         }			
     #else
         for (size_t temp = 0, row = n - 1; temp < n; row--, temp++) {

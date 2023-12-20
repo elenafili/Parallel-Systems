@@ -23,11 +23,10 @@ var_map = {
 }
 
 
-# ns = ['1024', '4096']
-# threads = ['1', '2', '4', '8', '12']
-ns = ['10240']
-threads = ['1', '2', '4', '8']
-# vars = ['', '-DTRI1', '-DTRI1 -DBACK', '-DTRI2', '-DTRI2 -DBACK']
+ns = ['1024', '4096']
+threads = ['1', '2', '4', '8', '12']
+# ns = ['10240']
+# threads = ['1', '2', '4', '8']
 vars = ['', '-DTRI1 -DBACK', '-DTRI2 -DBACK']
 
 # var_map = { x: type_map[i] for i, x in enumerate([vars[0]] + ['-DBACK'] + vars[1:]) }
@@ -79,7 +78,6 @@ for dfs_dim in [group for _, group in df_mean.groupby('n')]:
     ax.set_ylabel('time (sec)')
     ax.set_xticks([1] + list(range(2, 17, 2)))
 
-    # ax.plot(df_base['threads'], df_base['time_trig'], '.-', label='Baseline')
     for df in [group for _, group in dfs_dim.groupby('type')]:
         ax.plot(df['threads'], df['time_trig'], '.-', label=type_map[df["type"].values[0]])
 
@@ -88,6 +86,7 @@ for dfs_dim in [group for _, group in df_mean.groupby('n')]:
     plt.close()
 
 for dfs_dim in [group for _, group in df_mean.groupby('n')]:
+
     n = dfs_dim['n'].values[0]
 
     fig, ax = plt.subplots()
@@ -97,11 +96,16 @@ for dfs_dim in [group for _, group in df_mean.groupby('n')]:
     ax.set_ylabel('time (sec)')
     ax.set_xticks([1] + list(range(2, 17, 2)))
 
-    # ax.plot(df_base['threads'], df_base['time_rev'], '.-', label='Baseline')
-
     for df in [group for _, group in dfs_dim.groupby('type')]:
         ax.plot(df['threads'], df['time_rev'], '.-', label=type_map[df["type"].values[0]])
-
+        
     ax.legend(loc='best')
+
+    # subset = ['threads']
+    # dfs_dim['time_rev'] = dfs_dim.groupby(subset)['time_rev'].transform('mean')
+    # dfs_dim.drop_duplicates(subset=subset, keep='first', inplace=True) 
+    # dfs_dim = dfs_dim.reset_index(drop=True)
+    # ax.plot(dfs_dim['threads'], dfs_dim['time_rev'], '.-')
+
     plt.savefig(f'./output/plot-back-{n}.png', bbox_inches='tight')
     plt.close()
