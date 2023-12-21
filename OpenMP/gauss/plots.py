@@ -39,7 +39,7 @@ param_grid = [
 
 combs = [(n, '1', '') for n in ns] + list(itertools.product(*param_grid))
 
-output_csv = f'./output/results1.csv'
+output_csv = f'./output/results.csv'
 
 with open(output_csv, 'w') as file:
     file.write('n,threads,time_trig,time_rev,type\n')
@@ -79,6 +79,8 @@ for dfs_dim in [group for _, group in df_mean.groupby('n')]:
     ax.set_xticks([1] + list(range(2, 17, 2)))
 
     for df in [group for _, group in dfs_dim.groupby('type')]:
+        if df["type"].values[0] % 2 != 0:
+            continue
         ax.plot(df['threads'], df['time_trig'], '.-', label=type_map[df["type"].values[0]])
 
     ax.legend(loc='best')
@@ -96,16 +98,16 @@ for dfs_dim in [group for _, group in df_mean.groupby('n')]:
     ax.set_ylabel('time (sec)')
     ax.set_xticks([1] + list(range(2, 17, 2)))
 
-    for df in [group for _, group in dfs_dim.groupby('type')]:
-        ax.plot(df['threads'], df['time_rev'], '.-', label=type_map[df["type"].values[0]])
+    # for df in [group for _, group in dfs_dim.groupby('type')]:
+    #     ax.plot(df['threads'], df['time_rev'], '.-', label=type_map[df["type"].values[0]])
         
-    ax.legend(loc='best')
+    # ax.legend(loc='best')
 
-    # subset = ['threads']
-    # dfs_dim['time_rev'] = dfs_dim.groupby(subset)['time_rev'].transform('mean')
-    # dfs_dim.drop_duplicates(subset=subset, keep='first', inplace=True) 
-    # dfs_dim = dfs_dim.reset_index(drop=True)
-    # ax.plot(dfs_dim['threads'], dfs_dim['time_rev'], '.-')
+    subset = ['threads']
+    dfs_dim['time_rev'] = dfs_dim.groupby(subset)['time_rev'].transform('mean')
+    dfs_dim.drop_duplicates(subset=subset, keep='first', inplace=True) 
+    dfs_dim = dfs_dim.reset_index(drop=True)
+    ax.plot(dfs_dim['threads'], dfs_dim['time_rev'], '.-')
 
     plt.savefig(f'./output/plot-back-{n}.png', bbox_inches='tight')
     plt.close()

@@ -138,7 +138,7 @@ void back() {
 }
 
 void Usage(char* prog_name) {
-   fprintf(stderr, "usage: %s <thread_count> <n> <schedule> <chunk_size> <log file, optional>\n", prog_name);
+   fprintf(stderr, "usage: %s <thread_count> <n> <log file, optional>\n", prog_name);
    exit(0);
 }
 
@@ -174,7 +174,7 @@ int main(int argc, char* argv[]) {
     double start2, finish2;
 
     GET_TIME(start1);
-	gauss();
+	// gauss();
     GET_TIME(finish1);
 
     GET_TIME(start2);
