@@ -8,7 +8,7 @@ if len(sys.argv) != 2:
 n = int(sys.argv[1])
 
 A = np.fromfile('./files/A.bin', dtype=np.float64).reshape(n, n)
-x = np.fromfile('./files/x.bin', dtype=np.float64).reshape(n)
-y = np.fromfile('./files/y.bin', dtype=np.float64).reshape(n)
+x = np.fromfile('./files/x.bin', dtype=np.float64)
+y = np.fromfile('./files/y.bin', dtype=np.float64)
 
 print(f'|Ax - y|_1 = {np.sum(np.abs(A @ x - y))}')

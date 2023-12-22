@@ -1,21 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
-
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
-
 #include <omp.h>
 #include <assert.h>
-
 #include "my_rand.h"
 #include "timer.h"
 
 double* A;
 double* x;
 double* b;
-size_t n, thread_count;
+size_t n, threads;
 
 void write_matrix(double** mat, const size_t n, const char* path) {
 
@@ -70,10 +66,10 @@ void gauss() {
     register size_t off1, off2;
 
     #ifdef TRI1
-    #pragma omp parallel num_threads(thread_count) \
+    #pragma omp parallel num_threads(threads) \
     default(none) private(i, j, k, ratio, off1, off2) shared(A, b, n)
     #elif TRI2
-    #pragma omp parallel num_threads(thread_count) \
+    #pragma omp parallel num_threads(threads) \
     default(none) private(i, j, k) shared(A, b, n, ratio, off1, off2)
     #endif
     for (i = 0; i < n - 1; i++) {
@@ -112,7 +108,7 @@ void back() {
     #ifdef BACK
         double sum;
 
-        #pragma omp parallel num_threads(thread_count)
+        #pragma omp parallel num_threads(threads)
         for (size_t temp = 0, row = n - 1; temp < n; row--, temp++) {
             
             #pragma omp single 
@@ -138,7 +134,7 @@ void back() {
 }
 
 void Usage(char* prog_name) {
-   fprintf(stderr, "usage: %s <thread_count> <n> <log file, optional>\n", prog_name);
+   fprintf(stderr, "usage: %s <threads> <n> <log file, optional>\n", prog_name);
    exit(0);
 }
 
@@ -147,10 +143,10 @@ void Get_args(int argc, char* argv[])  {
 	if (argc < 3) 
 		Usage(argv[0]);
 
-	thread_count = strtol(argv[1], NULL, 10);
+	threads = strtol(argv[1], NULL, 10);
 	n = strtol(argv[2], NULL, 10);
 
-	if (thread_count <= 0 || n <= 0) 
+	if (threads <= 0 || n <= 0) 
 		Usage(argv[0]);
 }
 
@@ -204,7 +200,7 @@ int main(int argc, char* argv[]) {
     if (argc == 4) {
         FILE* file = fopen(argv[3], "a");
 
-        fprintf(file, "%ld,%ld,%f,%f,%ld\n", n, thread_count, finish1 - start1, finish2 - start2, id);
+        fprintf(file, "%ld,%ld,%f,%f,%ld\n", n, threads, finish1 - start1, finish2 - start2, id);
 
         fclose(file);
     }

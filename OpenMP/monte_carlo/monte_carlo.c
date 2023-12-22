@@ -5,7 +5,7 @@
 #include "timer.h"
 
 #define LONG long long
-#define MAX_THREADS 1024
+#define MAX_THREADS 12
 #define USAGE() {                                                               \
     fprintf(stderr, "Usage: %s <threads> <n> <log file, optional> \n", argv[0]);\
     fprintf(stderr, "       1 <= `threads` <= %d\n", MAX_THREADS);              \
