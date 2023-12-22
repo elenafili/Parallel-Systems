@@ -133,7 +133,7 @@ int main(int argc, char* argv[]) {
 
     GET_TIME(finish);
 
-    printf("Time Elapsed %f\n", finish - start);
+    printf("Time Elapsed: %f\n", finish - start);
 
     #ifdef VERIFY
         write_array(array, n, "./files/sortedArray.bin");
