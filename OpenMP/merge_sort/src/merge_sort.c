@@ -8,23 +8,27 @@
 #include "my_rand.h"
 #include "timer.h"
 
+size_t n, threads;
+
+#define THRESHOLD (n / (threads * 512))
+
 void Usage(char* prog_name) {
 	fprintf(stderr, "usage: %s <n> <threads> <log file, optional>\n", prog_name);
 	exit(0);
 }
 
-void Get_args(int argc, char* argv[], size_t* n, size_t* threads)  {
+void Get_args(int argc, char* argv[])  {
     if (argc < 3) 
         Usage(argv[0]);
 
-    *n = strtol(argv[1], NULL, 10);
-    *threads = strtol(argv[2], NULL, 10);
+    n = strtol(argv[1], NULL, 10);
+    threads = strtol(argv[2], NULL, 10);
 	
-    if (*threads <= 0 || *n <= 0) 
+    if (threads <= 0 || n <= 0) 
         Usage(argv[0]);
 }
 
-void gen_array(int* array, size_t n) {
+void gen_array(int* array) {
 	unsigned int seed = 15;
 
 	for (size_t i = 0; i < n; i++) 
@@ -73,17 +77,30 @@ void merge(int* array, size_t left, size_t middle, size_t right) {
     free(right_array);
 }
 
-void mergeSort(int* array, size_t left, size_t right, size_t threads) {
+void serial_mergeSort(int* array, size_t left, size_t right) {
     if (left >= right) 
         return;
 
     size_t middle = (left + right) / 2;
 
-    #pragma omp task if (threads > 1)
-    mergeSort(array, left, middle, threads);
+    serial_mergeSort(array, left, middle);
 
-    #pragma omp task if (threads > 1)
-    mergeSort(array, middle + 1, right, threads);
+    serial_mergeSort(array, middle + 1, right);
+
+    merge(array, left, middle, right);
+}
+
+void parallel_mergeSort(int* array, size_t left, size_t right) {
+    if (left >= right) 
+        return;
+
+    size_t middle = (left + right) / 2;
+
+    #pragma omp task if (right-left > THRESHOLD)
+    parallel_mergeSort(array, left, middle);
+
+    #pragma omp task if (right-left > THRESHOLD)
+    parallel_mergeSort(array, middle + 1, right);
 
     // Wait for both tasks to complete before merging
     #pragma omp taskwait 
@@ -92,12 +109,11 @@ void mergeSort(int* array, size_t left, size_t right, size_t threads) {
 
 int main(int argc, char* argv[]) {
     int* array;
-    size_t n, threads;
 
-	Get_args(argc, argv, &n, &threads);
+	Get_args(argc, argv);
 
 	array = malloc(n * sizeof(int));
-	gen_array(array, n);
+	gen_array(array);
 
     #ifdef VERIFY  
         write_array(array, n, "./files/initialArray.bin");
@@ -107,9 +123,13 @@ int main(int argc, char* argv[]) {
 
     GET_TIME(start);
 
-   	#pragma omp parallel num_threads(threads)
-    #pragma omp single
-    mergeSort(array, 0, n-1, threads);
+    if (threads == 1)
+        serial_mergeSort(array, 0, n-1);
+    else {
+        #pragma omp parallel num_threads(threads)
+        #pragma omp single
+        parallel_mergeSort(array, 0, n-1);
+    }
 
     GET_TIME(finish);
 
