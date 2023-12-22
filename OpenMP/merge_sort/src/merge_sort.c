@@ -149,10 +149,12 @@ int main(int argc, char* argv[]) {
 
     free(array);
     
-    if (execlp("python3", "pyhton3", "verify.py", (char *)NULL) < 0) {
-        perror("Exec failed.");
-        exit(EXIT_FAILURE);
-    }
+    #ifdef VERIFY
+        if (execlp("python3", "pyhton3", "verify.py", (char *)NULL) < 0) {
+            perror("Exec failed.");
+            exit(EXIT_FAILURE);
+        }
+    #endif
 
    return 0;
 }
