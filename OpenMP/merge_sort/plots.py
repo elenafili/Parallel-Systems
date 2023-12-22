@@ -14,12 +14,12 @@ param_grid = [
 ]
 
 output_csv = './output/results.csv'
-# with open(output_csv, 'w') as file:
-#     file.write('n,threads,time\n')
+with open(output_csv, 'w') as file:
+    file.write('n,threads,time\n')
 
-# for i, (n, threads) in enumerate(list(itertools.product(*param_grid))):
-#     for _ in range(4):
-#         subprocess.run(['./merge_sort', str(int(n)), str(threads), output_csv])
+for i, (n, threads) in enumerate(list(itertools.product(*param_grid))):
+    for _ in range(4):
+        subprocess.run(['./merge_sort', str(int(n)), str(threads), output_csv])
 
 
 log = lambda values : [np.log10(x) for x in values]
