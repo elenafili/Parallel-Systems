@@ -102,18 +102,18 @@ void parallel_mergeSort(int* array, size_t left, size_t right) {
     #pragma omp task if (right-left > THRESHOLD)
     parallel_mergeSort(array, middle + 1, right);
 
-    // Wait for both tasks to complete before merging
-    #pragma omp taskwait 
+    #pragma omp taskwait
+
     merge(array, left, middle, right);
 }
 
 int main(int argc, char* argv[]) {
     int* array;
 
-	Get_args(argc, argv);
+    Get_args(argc, argv);
 
-	array = malloc(n * sizeof(int));
-	gen_array(array);
+    array = malloc(n * sizeof(int));
+    gen_array(array);
 
     #ifdef VERIFY  
         write_array(array, n, "./files/initialArray.bin");
@@ -147,6 +147,12 @@ int main(int argc, char* argv[]) {
         fclose(file);
     }
 
-   free(array);
+    free(array);
+    
+    if (execlp("python3", "pyhton3", "verify.py", (char *)NULL) < 0) {
+        perror("Exec failed.");
+        exit(EXIT_FAILURE);
+    }
+
    return 0;
 }
