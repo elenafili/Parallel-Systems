@@ -1,0 +1,192 @@
+Running with 1000,1,1
+Elapsed time = 8.065701e-03,3.061295e-03
+||Ax - y||_1 = 0.000000e+00
+Running with 1000,1,4
+Elapsed time = 5.556345e-03,7.953644e-04
+||Ax - y||_1 = 1.648743e-10
+Running with 1000,4,16
+Elapsed time = 7.209039e-02,2.522469e-04
+||Ax - y||_1 = 1.617764e-10
+Running with 1000,16,64
+Elapsed time = 1.234968e-01,7.247925e-05
+||Ax - y||_1 = 1.498677e-10
+Running with 1000,1,1
+Elapsed time = 7.727623e-03,3.057718e-03
+||Ax - y||_1 = 0.000000e+00
+Running with 1000,1,4
+Elapsed time = 5.606413e-03,8.358955e-04
+||Ax - y||_1 = 1.701892e-10
+Running with 1000,4,16
+Elapsed time = 7.416892e-02,2.324581e-04
+||Ax - y||_1 = 1.598437e-10
+Running with 1000,16,64
+Elapsed time = 1.255720e-01,6.532669e-05
+||Ax - y||_1 = 1.678018e-10
+Running with 1000,1,1
+Elapsed time = 7.993698e-03,3.142118e-03
+||Ax - y||_1 = 0.000000e+00
+Running with 1000,1,4
+Elapsed time = 1.737046e-02,1.965523e-03
+||Ax - y||_1 = 1.780620e-10
+Running with 1000,4,16
+Elapsed time = 7.368255e-02,2.369881e-04
+||Ax - y||_1 = 1.583942e-10
+Running with 1000,16,64
+Elapsed time = 1.282163e-01,7.581711e-05
+||Ax - y||_1 = 1.635385e-10
+Running with 1000,1,1
+Elapsed time = 1.294374e-02,4.641294e-03
+||Ax - y||_1 = 0.000000e+00
+Running with 1000,1,4
+Elapsed time = 5.544424e-03,8.037090e-04
+||Ax - y||_1 = 1.690523e-10
+Running with 1000,4,16
+Elapsed time = 7.095861e-02,2.429485e-04
+||Ax - y||_1 = 1.697913e-10
+Running with 1000,16,64
+Elapsed time = 1.216028e-01,7.343292e-05
+||Ax - y||_1 = 1.605827e-10
+Running with 5000,1,1
+Elapsed time = 1.890335e-01,7.711625e-02
+||Ax - y||_1 = 0.000000e+00
+Running with 5000,1,4
+Elapsed time = 1.382120e-01,1.984072e-02
+||Ax - y||_1 = 1.066178e-08
+Running with 5000,4,16
+Elapsed time = 1.561828e+00,5.678654e-03
+||Ax - y||_1 = 1.053013e-08
+Running with 5000,16,64
+Elapsed time = 2.895177e+00,7.266760e-03
+||Ax - y||_1 = 1.029503e-08
+Running with 5000,1,1
+Elapsed time = 1.858947e-01,7.322288e-02
+||Ax - y||_1 = 0.000000e+00
+Running with 5000,1,4
+Elapsed time = 1.340287e-01,2.007270e-02
+||Ax - y||_1 = 1.070612e-08
+Running with 5000,4,16
+Elapsed time = 1.521430e+00,1.693940e-02
+||Ax - y||_1 = 1.012540e-08
+Running with 5000,16,64
+Elapsed time = 2.741181e+00,1.488447e-03
+||Ax - y||_1 = 1.042235e-08
+Running with 5000,1,1
+Elapsed time = 1.855729e-01,7.317924e-02
+||Ax - y||_1 = 0.000000e+00
+Running with 5000,1,4
+Elapsed time = 1.331992e-01,1.985264e-02
+||Ax - y||_1 = 1.075136e-08
+Running with 5000,4,16
+Elapsed time = 1.535872e+00,1.711226e-02
+||Ax - y||_1 = 1.048761e-08
+Running with 5000,16,64
+Elapsed time = 2.863630e+00,5.231142e-03
+||Ax - y||_1 = 1.041576e-08
+Running with 5000,1,1
+Elapsed time = 1.846778e-01,7.336211e-02
+||Ax - y||_1 = 0.000000e+00
+Running with 5000,1,4
+Elapsed time = 1.347182e-01,1.989532e-02
+||Ax - y||_1 = 1.098783e-08
+Running with 5000,4,16
+Elapsed time = 1.517442e+00,5.912781e-03
+||Ax - y||_1 = 1.063790e-08
+Running with 5000,16,64
+Elapsed time = 2.781861e+00,5.241156e-03
+||Ax - y||_1 = 1.042372e-08
+Running with 10000,1,1
+Elapsed time = 7.390163e-01,2.934518e-01
+||Ax - y||_1 = 0.000000e+00
+Running with 10000,1,4
+Elapsed time = 5.338643e-01,7.935572e-02
+||Ax - y||_1 = 6.176106e-08
+Running with 10000,4,16
+Elapsed time = 6.137638e+00,4.453635e-02
+||Ax - y||_1 = 5.933498e-08
+Running with 10000,16,64
+Elapsed time = 1.122287e+01,1.727676e-02
+||Ax - y||_1 = 5.790889e-08
+Running with 10000,1,1
+Elapsed time = 7.415669e-01,2.944129e-01
+||Ax - y||_1 = 0.000000e+00
+Running with 10000,1,4
+Elapsed time = 5.352764e-01,7.983422e-02
+||Ax - y||_1 = 5.939000e-08
+Running with 10000,4,16
+Elapsed time = 6.095547e+00,3.328323e-02
+||Ax - y||_1 = 5.925676e-08
+Running with 10000,16,64
+Elapsed time = 1.130710e+01,1.286840e-02
+||Ax - y||_1 = 5.901165e-08
+Running with 10000,1,1
+Elapsed time = 7.425792e-01,2.928083e-01
+||Ax - y||_1 = 0.000000e+00
+Running with 10000,1,4
+Elapsed time = 5.307734e-01,7.948017e-02
+||Ax - y||_1 = 6.057462e-08
+Running with 10000,4,16
+Elapsed time = 6.110735e+00,4.045606e-02
+||Ax - y||_1 = 5.852371e-08
+Running with 10000,16,64
+Elapsed time = 1.120421e+01,2.697635e-02
+||Ax - y||_1 = 5.869151e-08
+Running with 10000,1,1
+Elapsed time = 7.407546e-01,2.931783e-01
+||Ax - y||_1 = 0.000000e+00
+Running with 10000,1,4
+Elapsed time = 5.298474e-01,7.943225e-02
+||Ax - y||_1 = 6.168148e-08
+Running with 10000,4,16
+Elapsed time = 6.147131e+00,3.163528e-02
+||Ax - y||_1 = 5.889478e-08
+Running with 10000,16,64
+Elapsed time = 1.130087e+01,5.826712e-03
+||Ax - y||_1 = 5.814718e-08
+Running with 15000,1,1
+Elapsed time = 1.669903e+00,6.618633e-01
+||Ax - y||_1 = 0.000000e+00
+Running with 15000,1,4
+Elapsed time = 1.193519e+00,1.785347e-01
+||Ax - y||_1 = 1.504741e-07
+Running with 15000,4,16
+Elapsed time = 1.375634e+01,8.838606e-02
+||Ax - y||_1 = 1.453027e-07
+Running with 15000,16,64
+Elapsed time = 2.530354e+01,2.294874e-02
+||Ax - y||_1 = 1.417943e-07
+Running with 15000,1,1
+Elapsed time = 1.659265e+00,6.609907e-01
+||Ax - y||_1 = 0.000000e+00
+Running with 15000,1,4
+Elapsed time = 1.192615e+00,1.790998e-01
+||Ax - y||_1 = 1.498192e-07
+Running with 15000,4,16
+Elapsed time = 1.378414e+01,9.530663e-02
+||Ax - y||_1 = 1.460085e-07
+Running with 15000,16,64
+Elapsed time = 2.539473e+01,1.933885e-02
+||Ax - y||_1 = 1.418766e-07
+Running with 15000,1,1
+Elapsed time = 1.675166e+00,6.639485e-01
+||Ax - y||_1 = 0.000000e+00
+Running with 15000,1,4
+Elapsed time = 1.191411e+00,1.784194e-01
+||Ax - y||_1 = 1.473491e-07
+Running with 15000,4,16
+Elapsed time = 1.376540e+01,8.824754e-02
+||Ax - y||_1 = 1.472044e-07
+Running with 15000,16,64
+Elapsed time = 2.492277e+01,2.313972e-02
+||Ax - y||_1 = 1.418784e-07
+Running with 15000,1,1
+Elapsed time = 1.658208e+00,6.594629e-01
+||Ax - y||_1 = 0.000000e+00
+Running with 15000,1,4
+Elapsed time = 1.193079e+00,1.789351e-01
+||Ax - y||_1 = 1.477533e-07
+Running with 15000,4,16
+Elapsed time = 1.376442e+01,9.079885e-02
+||Ax - y||_1 = 1.456096e-07
+Running with 15000,16,64
+Elapsed time = 2.533321e+01,2.335930e-02
+||Ax - y||_1 = 1.416101e-07
