@@ -1,31 +1,39 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <omp.h>
-#include <time.h>
+#include <math.h>
+#include <pthread.h>
+#include <mpi.h>
 #include "timer.h"
 
 #define LONG long long
-#define MAX_THREADS 12
-#define USAGE() {                                                               \
-    fprintf(stderr, "Usage: %s <threads> <n> <log file, optional> \n", argv[0]);\
-    fprintf(stderr, "       1 <= `threads` <= %d\n", MAX_THREADS);              \
-    fprintf(stderr, "       `n` >= 1 and divisible by `threads`\n");            \
-    exit(EXIT_FAILURE);                                                         \
-}
 
-#define ASSERT(call)             \
-    if (call < 0) {              \
-        perror(#call " failed"); \
-        exit(EXIT_FAILURE);      \
-    }                            \
+int main(int argc, char* argv[]) {
 
+    MPI_Init(NULL, NULL);
 
-double serial_pi(LONG n) {
+    double start, finish, elapsed;
+    int comm_sz, rank;
+    LONG n, total_arrows;
+
+    MPI_Comm_size(MPI_COMM_WORLD, &comm_sz); 
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    if(rank == 0) {
+        fprintf(stdout, "Give number of arrow to be thrown: ");
+        scanf("%lld", &n);
+        
+        GET_TIME(start);
+
+        n /= comm_sz;
+    }
+
+    MPI_Bcast(&n, 1, MPI_LONG, 0, MPI_COMM_WORLD);
+
     LONG arrows = 0;
 
     double range = (1.0 - (-1.0)); 
     double div = RAND_MAX / range;
-    unsigned int mystate = time(NULL);
+    unsigned int mystate = time(NULL) ^ rank;
 
     for (LONG i = 0; i < n; i++) {
         double x = -1.0 + (rand_r(&mystate) / div);
@@ -35,65 +43,32 @@ double serial_pi(LONG n) {
             arrows++;
     }
 
-    return 4 * arrows / (double) n;
-}
+    MPI_Reduce(&arrows, &total_arrows, 1, MPI_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
 
+    if(rank == 0) {
 
-double threaded_pi(size_t threads, LONG n) {
-    LONG arrows = 0;
-    
-	#pragma omp parallel num_threads(threads) \
-    reduction(+: arrows)
-    {
-        double range = (1.0 - (-1.0)); 
-        double div = RAND_MAX / range;
-        unsigned int mystate = time(NULL) - omp_get_thread_num();
+        GET_TIME(finish);
+        elapsed = finish - start;
 
-        #pragma omp for
-        for (LONG i = 0; i < n; i++) {
-            double x = -1.0 + (rand_r(&mystate) / div);
-            double y = -1.0 + (rand_r(&mystate) / div);
+        double pi = 4 * total_arrows / ((double) n * comm_sz);
+        
+        fprintf(stdout, "+-----------+------------+---------------+\n");
+        fprintf(stdout, "| Processes |     pi     | elapsed (sec) |\n");
+        fprintf(stdout, "|-----------+------------+---------------|\n");
+        fprintf(stdout, "|    %2d     | %.8f | %13.8f |\n", comm_sz, pi, elapsed);
+        fprintf(stdout, "+-----------+-------------+---------------+\n");
 
-            if (x * x + y * y <= 1)
-                arrows++;
+        
+        if (argc == 2) {
+            FILE* file = fopen(argv[1], "a");
+
+            fprintf(file, "%lld,%d,%f\n", n, comm_sz, elapsed);
+
+            fclose(file);
         }
-    }
+    } 
 
-    return 4 * arrows / (double) n;
-}
-
-int main(int argc, char* argv[]) {
-    if (argc < 3)
-        USAGE()
+    MPI_Finalize();
     
-    size_t threads = atol(argv[1]);
-    LONG n = atoll(argv[2]);
-
-    if (threads > MAX_THREADS || n == 0)
-        USAGE()
-
-    fprintf(stdout, "+-----------+------------+---------------+\n");
-    fprintf(stdout, "|  Threads  |     pi     | elapsed (sec) |\n");
-    fprintf(stdout, "|-----------+------------+---------------|\n");
-
-    double start, finish, pi;
-
-    GET_TIME(start);
-    pi = threads == 1 ? serial_pi(n) : threaded_pi(threads, n);
-    GET_TIME(finish);
-
-    double threaded_time = finish - start;
-    fprintf(stdout, "|    %2ld     | %.8f | %13.8f |\n", threads, pi, threaded_time);
-
-    fprintf(stdout, "+-----------+------------+---------------+\n");
-
-    if (argc == 4) {
-        FILE* file = fopen(argv[3], "a");
-
-        fprintf(file, "%lld,%ld,%f\n", n, threads, threaded_time);
-
-        fclose(file);
-    }
-
     return 0;
 }
