@@ -39,6 +39,7 @@ double* reshape(double* A, int columns, int local_n, int block_size) {
 }
 
 int main(int argc, char *argv[]) {
+
 	double start = 0, finish = 0, loc_elapsed = 0, elapsed = 0;
 	double start_after = 0, loc_elapsed_after = 0, elapsed_after = 0;
 
@@ -52,6 +53,26 @@ int main(int argc, char *argv[]) {
 	double* Matrix = NULL;
 	double* Vector = NULL;
 	double* Product = NULL;
+	
+	columns = (int)sqrt(comm_sz);
+	local_n = N / columns;
+	block_size = local_n * local_n;
+
+	if (columns * columns != comm_sz) {
+		if (rank == 0)
+			printf("comm_sz = %d should be a perfect square!\n", comm_sz);
+		
+		MPI_Finalize();
+		exit(-1);
+	}
+
+	if (N % columns != 0) {
+		if (rank == 0)
+			printf("Square root of comm_sz should divide matrix size\n");
+
+		MPI_Finalize();
+		exit(-1);
+	}
 
 	if (rank == 0) {
 		Matrix = calloc(N * N, sizeof(double));
@@ -64,20 +85,6 @@ int main(int argc, char *argv[]) {
 			exit(-1);
 		}
 	}
-
-	
-	columns = (int)sqrt(comm_sz);
-
-	if (columns * columns != comm_sz) {
-		printf("comm_sz = %d should be a perfect square!\n", comm_sz);
-		MPI_Finalize();
-		exit(-1);
-	}
-
-
-	local_n = N / columns;
-	block_size = local_n * local_n;
-
 
 	int col_id = rank / columns;
 	int col_rank;
@@ -100,22 +107,20 @@ int main(int argc, char *argv[]) {
 		generate_vector(Vector, N);
 	}
 
-	if (N % columns != 0) {
-		printf("Square root of comm_sz should divide matrix size\n");
-		MPI_Comm_free(&col_comm);
-		MPI_Comm_free(&row_comm);
-		MPI_Finalize();
-		exit(-1);
-	}
-
 	double* Local_Matrix = calloc(block_size, sizeof(double));
 	double* Local_Vector = calloc(local_n, sizeof(double));
-	double* Head_Product = calloc(local_n, sizeof(double));
+	double* Head_Product = rank % columns == 0 ? calloc(local_n, sizeof(double)) : NULL;
 	double* Local_Product = calloc(local_n, sizeof(double));
 
 	if (Local_Matrix == NULL || Local_Vector == NULL || 
-		Head_Product == NULL || Local_Product == NULL) {
-		printf("calloc failed on rank: %d!\n", rank);
+		(rank % columns == 0 && Head_Product == NULL) || 
+		Local_Product == NULL) {
+
+		if (rank == 0)
+			printf("calloc failed on rank: %d!\n", rank);
+
+		MPI_Comm_free(&col_comm);
+		MPI_Comm_free(&row_comm);
 		MPI_Finalize();
 		exit(-1);
 	}
@@ -130,10 +135,6 @@ int main(int argc, char *argv[]) {
 		MPI_Scatter(Vector, local_n, MPI_DOUBLE, Local_Vector, local_n, MPI_DOUBLE, 0, col_comm);
 
 	MPI_Bcast(Local_Vector, local_n, MPI_DOUBLE, 0, row_comm);
-
-	// Scatter product to the processes
-	if (rank % columns == 0) 
-		MPI_Scatter(Product, local_n, MPI_DOUBLE, Head_Product, local_n, MPI_DOUBLE, 0, row_comm);
 
 	start_after = MPI_Wtime();
 
@@ -194,7 +195,6 @@ int main(int argc, char *argv[]) {
 		free(Product);
 	}
 
-
 	MPI_Comm_free(&col_comm);
 	MPI_Comm_free(&row_comm);
 	MPI_Finalize();
@@ -203,8 +203,7 @@ int main(int argc, char *argv[]) {
 }
 
   
-void generate_matrix(double* matrix, const size_t n, int columns, int local_n, int block_size){
-
+void generate_matrix(double* matrix, const size_t n, int columns, int local_n, int block_size) {
 	unsigned int seed = time(NULL) ^ n;
 
 	for (int i = 0; i < n; i++) {
@@ -217,15 +216,13 @@ void generate_matrix(double* matrix, const size_t n, int columns, int local_n, i
 }
 
 void generate_vector(double* vector, const size_t n) {
-
 	unsigned int seed = time(NULL) ^ n;
 	
 	for (int i = 0; i < n; i++)
 		vector[i] = my_drand(&seed);
 }
 
-void print_matrix(double* matrix, const size_t n, int columns, int local_n, int block_size){
-
+void print_matrix(double* matrix, const size_t n, int columns, int local_n, int block_size) {
 	for (int i = 0; i < n; i++) {
 
 		for (int j = 0; j < n; j++) {
