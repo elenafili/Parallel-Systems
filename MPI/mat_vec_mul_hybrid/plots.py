@@ -11,7 +11,7 @@ rows = []
 
 transform = lambda i, x : float(x) if i > 2 else int(x)
 
-with open('./output/out.txt', 'r') as file:
+with open('./output/out3.txt', 'r') as file:
     while True:
         lines = [file.readline() for _ in range(3)]
 
